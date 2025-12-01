@@ -10,3 +10,6 @@ up: backend
 down:
 	@pkill -f "uvicorn main:app" || true
 	@echo "Backend stopped"
+
+check:
+	cd backend && uv run ruff check
