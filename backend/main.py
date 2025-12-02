@@ -2,19 +2,12 @@ from typing import Dict, List
 
 from fastapi import FastAPI, HTTPException, status
 
-from dto import Node, NodeCreate
+from dto import Node
 
 
 app = FastAPI()
 
 nodes: Dict[int, Node] = {}
-_next_id: int = 1
-
-def _generate_id() -> int:
-    global _next_id
-    node_id = _next_id
-    _next_id += 1
-    return node_id
 
 
 @app.get("/api/v1/nodes", response_model=List[Node])
@@ -36,11 +29,10 @@ def get_node(node_id: int) -> Node:
 
 
 @app.post("/api/v1/nodes", response_model=Node, status_code=status.HTTP_201_CREATED)
-def create_node(payload: NodeCreate) -> Node:
+def create_node(payload: Node) -> Node:
     """Create a new node."""
-    node_id = _generate_id()
-    node = Node(id=node_id, **payload.model_dump())
-    nodes[node_id] = node
+    node = Node(**payload.model_dump())
+    nodes[node.id] = node
     return node
 
 

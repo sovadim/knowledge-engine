@@ -16,9 +16,13 @@ class NodeLevel(str, Enum):
     A1 = "A1"
     A2 = "A2"
     A3 = "A3"
+    A4 = "A4"
 
 
-class NodeCreate(BaseModel):
+class Node(BaseModel):
+    id: int
+    name: str
+
     status: NodeStatus
     level: NodeLevel
 
@@ -26,7 +30,7 @@ class NodeCreate(BaseModel):
     parent_nodes: List[int] = []
 
     questions: Optional[List[str]] = None
-    criterias: Optional[List[str]] = None
-
-class Node(NodeCreate):
-    id: int
+    criterias_a1: Optional[List[str]] = None
+    criterias_a2: Optional[List[str]] = None
+    criterias_a3: Optional[List[str]] = None
+    criterias_a4: Optional[List[str]] = None
