@@ -18,13 +18,15 @@ class NodeLevel(str, Enum):
     A3 = "A3"
 
 
-class Node(BaseModel):
-    id: int
+class NodeCreate(BaseModel):
     status: NodeStatus
     level: NodeLevel
 
-    child_nodes: List[int]
-    parent_nodes: List[int]
+    child_nodes: List[int] = []
+    parent_nodes: List[int] = []
 
     questions: Optional[List[str]] = None
     criterias: Optional[List[str]] = None
+
+class Node(NodeCreate):
+    id: int
