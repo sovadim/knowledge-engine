@@ -1,0 +1,124 @@
+[
+  {
+    "id": 1,
+    "name": "Java",
+    "status": "not_reached",
+    "level": "A1",
+    "child_nodes": [2, 3],
+    "parent_nodes": [],
+    "questions": null,
+    "criterias_a1": null,
+    "criterias_a2": null,
+    "criterias_a3": null,
+    "criterias_a4": null
+  },
+  {
+    "id": 2,
+    "name": "Nested class",
+    "status": "not_reached",
+    "level": "A1",
+    "child_nodes": [],
+    "parent_nodes": [1],
+    "questions": [
+      "What is the difference between a static nested class and a non-static inner class?",
+      "When and why would you use an anonymous inner class?",
+      "How do local inner classes behave differently from other inner classes?",
+      "Give an example situation where using a static nested class is preferred."
+    ],
+    "criterias_a1": [
+      "Static nested class doesn't need an outer class instance; inner class does.",
+      "To create a one-time implementation of an interface or abstract class.",
+      "Local classes are defined inside a method.",
+      "When the nested class doesn't need the outer class."
+    ],
+    "criterias_a2": [
+      "Static nested class can access only static members of the outer class. Inner class can access both static and instance members of the outer class.",
+      "For short, inline behavior like event listeners or quick Runnable implementations.",
+      "Local classes can access final or effectively final variables from the method.",
+      "Example: grouping a Builder inside a class (e.g., Person.Builder)"
+    ],
+    "criterias_a3": [
+      "Static nested classes behave like regular static members and reduce memory footprint. Inner classes hold an implicit reference to the outer instance, which impacts design and potential memory leaks.",
+      "To override methods inline without creating a separate class, especially before Java 8. Also knows limitations: no constructor, difficult to test, verbose compared to lambdas.",
+      "Understands compiler behavior: local classes are compiled into separate synthetic class files; they capture method variables by copying them, not referencing directly.",
+      "When the nested class logically belongs to the outer class but shouldn't keep a reference to it — improves testability and reduces memory leaks."
+    ],
+    "criterias_a4": [
+      "Static nested classes improve encapsulation and reduce coupling; inner classes are used when behavior relates tightly to an outer instance. Also able to discuss when replacing inner classes with top-level classes or lambdas yields better architecture.",
+      "Only in cases where a lambda cannot express the behavior (e.g., multiple methods). Otherwise avoid for readability and prefer lambdas/strategy classes. Understands architectural tradeoffs",
+      "Discusses scoping rules, lifecycle, and how misuse can lead to unclear code. Explains advanced compilation details and why local classes should be used only when scoping is critical.",
+      "Uses static nested classes for domain modeling, builder patterns, DTOs, and utility components. Explains how this design choice aligns with clean architecture and reduces class proliferation."
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Packaging",
+    "status": "not_reached",
+    "level": "A1",
+    "child_nodes": [2],
+    "parent_nodes": [1],
+    "questions": [
+      "What is the purpose of a Java package?",
+      "What is the difference between default access and public access in the context of packages?",
+      "What does the final keyword do when applied to a variable, method, and class?",
+      "What is the difference between a static variable and an instance variable?",
+      "What is an abstract class and how is it different from an interface?"
+    ],
+    "criterias_a1": [
+      "Packages group classes and avoid name conflicts.",
+      "Default access is visible inside the same package; public is visible everywhere.",
+      "final variable → value cannot change; final method → cannot be overridden; final class → cannot be extended.",
+      "static belongs to the class; instance variable belongs to objects.",
+      "Abstract class cannot be instantiated; may contain abstract methods. Interface defines methods without implementation"
+    ],
+    "criterias_a2": [
+      "Adds: packaging organizes code logically and controls access (default access).",
+      "Default limits access to package scope; public exposes class or method to all packages.",
+      "Correct A1 + explains that final variables must be initialized once and classes like String are final for immutability.",
+      "Adds that static variables share one memory copy across all objects; instance variables are per-object.",
+      "Adds that abstract classes can have constructors, fields, and some implemented methods; interfaces use default methods."
+    ],
+    "criterias_a3": [
+      "Adds: explains how packaging supports maintainability, modularization, and clear layering in larger codebases.",
+      "Default access is used to hide internal implementation details; public is used for APIs intended for cross-package use.",
+      "Correct A1-A2 + explains uses in thread-safety, immutability patterns, and why final prevents accidental inheritance/override.",
+      "Adds real use cases: constants, utility helpers, counters, and explains static context limitations (no access to instance members).",
+      "Adds that abstract classes define shared behavior and state; interfaces specify capabilities and allow multiple inheritance."
+    ],
+    "criterias_a4": [
+      "Adds: explains packaging as part of architectural design (layered architecture, multi-module systems, enforcing boundaries).",
+      "Package-private is used to enforce encapsulation across bounded contexts; public APIs are deliberately designed as stable interfaces.",
+      "Explains A1-A3 + discusses design decisions, API stability, and how final interacts with dependency injection, code optimization, and architecture boundaries.",
+      "Adds architectural considerations: avoiding excessive static state, testability issues, thread-safety concerns when using static mutable data.",
+      "Adds design reasoning: when to choose abstract class vs interface based on domain modeling, extensibility, avoiding breaking changes, and SOLID principles."
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Serialization",
+    "status": "not_reached",
+    "level": "A1",
+    "child_nodes": [],
+    "parent_nodes": [1],
+    "questions": [
+      "What is Java Serialization and why do we use it?",
+      "How do you serialize a class in Java? What are the requirements?"
+    ],
+    "criterias_a1": [
+      "Serialization converts an object into a byte stream so it can be saved or transferred.",
+      "Implement Serializable interface."
+    ],
+    "criterias_a2": [
+      "Serialization turns an object into bytes to store or send it; useful for caching, saving state, or sending objects over the network.",
+      "Implement Serializable and ensure all fields are serializable or marked transient."
+    ],
+    "criterias_a3": [
+      "Serialization is the conversion of object graphs to bytes. Used in distributed systems, persistence, and messaging. Understands limitations and alternatives (JSON ).",
+      "Knows serialVersionUID importance, behavior with inheritance, and custom write/read logic (writeObject, readObject)."
+    ],
+    "criterias_a4": [
+      "Knows serialization's use cases and risks (performance, security vulnerabilities). Explains system-level decisions (why to avoid native serialization, choose faster/safer formats).",
+      "Mentions design decisions: avoiding Serializable in new systems, preferring explicit serialization frameworks (Jackson, Gson, Kryo). Guides the team in safe/consistent serialization strategies."
+    ]
+  }
+]
