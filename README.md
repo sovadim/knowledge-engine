@@ -4,6 +4,22 @@
 
 * [uv](https://docs.astral.sh/uv/#installation) (alternative python package manager)
 
+## Project structure
+
+```
+knowledge-engine
+|__backend  - FastAPI backend
+|__demo     - Demo data and script
+|__frontend - ReactJS frontend
+```
+
+## How to Run Demo
+
+Using `make`:
+```bash
+$ make demo # will start backend and demo script
+```
+
 ## Backend
 
 __In backend directory__
