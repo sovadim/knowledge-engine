@@ -1,4 +1,4 @@
-.PHONY: demo up down backend
+.PHONY: demo up down backend frontend
 
 demo: up
 	cd demo && uv sync
@@ -14,6 +14,10 @@ up: backend
 down:
 	@pkill -f "uvicorn main:app" || true
 	@echo "Backend stopped"
+
+frontend:
+	cd frontend && npm install
+	cd frontend && npm run dev
 
 check:
 	cd backend && uv run ruff check
