@@ -1,23 +1,29 @@
-.PHONY: demo up down backend frontend
+.PHONY: demo frontend-init backend-init backend frontend start stop
 
-demo: up
+demo: start
 	cd demo && uv sync
 	cd demo && uv run python main.py
 
-backend:
+frontend-init:
+	cd frontend && npm install
+
+frontend: frontend-init
+	cd frontend && npm run dev &
+	@echo "Frontend started"
+
+backend-init:
 	cd backend && uv sync
 
-up: backend
+backend:
 	cd backend && uv run uvicorn main:app --reload &
 	@echo "Backend started"
 
-down:
-	@pkill -f "uvicorn main:app" || true
-	@echo "Backend stopped"
+start: backend frontend
 
-frontend:
-	cd frontend && npm install
-	cd frontend && npm run dev
+stop:
+	@pkill -f "uvicorn main:app" || true
+	@pkill -f "npm run dev" || true
+	@echo "Backend and frontend stopped"
 
 check:
 	cd backend && uv run ruff check
