@@ -2,7 +2,7 @@ from typing import Dict, List
 
 from fastapi import FastAPI, HTTPException, status, Query
 
-from dto import Node
+from dto import Node, NodeStatus
 
 
 app = FastAPI()
@@ -99,6 +99,34 @@ def delete_edge(from_id: int = Query(..., alias="from"),
     if from_id in dst.parent_nodes:
         dst.parent_nodes.remove(from_id)
 
+    return None
+
+
+@app.post("/api/nodes/{node_id}/disable", status_code=status.HTTP_204_NO_CONTENT)
+def disable_node(node_id: int) -> None:
+    """Set node status to 'disabled'."""
+    node = nodes.get(node_id)
+    if not node:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Node {node_id} not found",
+        )
+
+    node.status = NodeStatus.DISABLED
+    return None
+
+
+@app.post("/api/nodes/{node_id}/enable", status_code=status.HTTP_204_NO_CONTENT)
+def enable_node(node_id: int) -> None:
+    """Set node status to 'not_reached'."""
+    node = nodes.get(node_id)
+    if not node:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Node {node_id} not found",
+        )
+
+    node.status = NodeStatus.NOT_REACHED
     return None
 
 
