@@ -130,6 +130,36 @@ def enable_node(node_id: int) -> None:
     return None
 
 
+@app.post("/api/chat/start")
+def chat_start():
+    """
+    Start the interview. Returns the first question.
+    """
+    return {
+        "question": "stub message: the first question"
+    }
+
+
+@app.post("/api/chat/answer")
+def chat_answer(answer: str):
+    """
+    Receive user's answer and return next question.
+    """
+    return {
+        "question": "stub message: next question"
+    }
+
+
+@app.post("/api/chat/stop")
+def chat_stop():
+    """
+    Stop the interview.
+    """
+    return {
+        "message": "stub message: interview stopped"
+    }
+
+
 @app.get("/ping")
 def ping():
     return {"message": "pong"}
