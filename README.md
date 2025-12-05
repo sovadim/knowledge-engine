@@ -18,6 +18,7 @@ knowledge-engine
 Using `make`:
 ```bash
 $ make demo # will start backend and demo script
+$ make down # will stop backend
 ```
 
 ## Backend
