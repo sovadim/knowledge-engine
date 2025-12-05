@@ -2,7 +2,7 @@ import json
 import requests
 from pathlib import Path
 
-BACKEND_URL = "http://127.0.0.1:8000/api/v1/nodes"
+BACKEND_URL = "http://127.0.0.1:8000/api/nodes"
 DEMO_FILE = Path(__file__).parent / "nodes.json"
 
 

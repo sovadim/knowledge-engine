@@ -10,13 +10,13 @@ app = FastAPI()
 nodes: Dict[int, Node] = {}
 
 
-@app.get("/api/v1/nodes", response_model=List[Node])
+@app.get("/api/nodes", response_model=List[Node])
 def list_nodes() -> List[Node]:
     """Return all nodes."""
     return list(nodes.values())
 
 
-@app.get("/api/v1/nodes/{node_id}", response_model=Node)
+@app.get("/api/nodes/{node_id}", response_model=Node)
 def get_node(node_id: int) -> Node:
     """Return a single node by id."""
     node = nodes.get(node_id)
@@ -28,7 +28,7 @@ def get_node(node_id: int) -> Node:
     return node
 
 
-@app.post("/api/v1/nodes", response_model=Node, status_code=status.HTTP_201_CREATED)
+@app.post("/api/nodes", response_model=Node, status_code=status.HTTP_201_CREATED)
 def create_node(payload: Node) -> Node:
     """Create a new node."""
     node = Node(**payload.model_dump())
@@ -36,7 +36,7 @@ def create_node(payload: Node) -> Node:
     return node
 
 
-@app.delete("/api/v1/nodes/{node_id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete("/api/nodes/{node_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_node(node_id: int) -> None:
     """Delete a node by id."""
     if node_id not in nodes:
