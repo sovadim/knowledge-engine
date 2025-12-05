@@ -8,35 +8,30 @@
 
 ```
 knowledge-engine
+|__frontend - ReactJS frontend
 |__backend  - FastAPI backend
 |__demo     - Demo data and script
-|__frontend - ReactJS frontend
 ```
 
-## How to Run Demo
+## How to Run
 
-Using `make`:
+### Demo
+
 ```bash
-$ make demo # will start backend and demo script
-$ make down # will stop backend
+$ make demo # start backend, frontend, and demo script
+$ make stop # stop backend and frontend
 ```
 
-## Backend
+### Backend Only
 
-__In backend directory__
-
-**How to setup:**
 ```bash
-$ uv sync
+$ make backend # setup backend project and run it
+$ make stop    # stop backend
 ```
 
-**How to run:**
-```bash
-$ uv run uvicorn main:app
-```
+### Frontend Only
 
-**Or with a make command:**
 ```bash
-$ make up    # run backend
-$ make down  # stop backend
+$ make frontend # setup frontend project and run it
+$ make stop     # stop frontend
 ```
