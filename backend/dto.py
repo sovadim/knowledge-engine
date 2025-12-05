@@ -16,7 +16,6 @@ class NodeLevel(str, Enum):
     A1 = "A1"
     A2 = "A2"
     A3 = "A3"
-    A4 = "A4"
 
 
 class Node(BaseModel):
@@ -29,8 +28,7 @@ class Node(BaseModel):
     child_nodes: List[int] = []
     parent_nodes: List[int] = []
 
-    questions: Optional[List[str]] = None
-    criterias_a1: Optional[List[str]] = None
-    criterias_a2: Optional[List[str]] = None
-    criterias_a3: Optional[List[str]] = None
-    criterias_a4: Optional[List[str]] = None
+    question: Optional[str] = None
+    criteria_a1: Optional[str] = None
+    criteria_a2: Optional[str] = None
+    criteria_a3: Optional[str] = None
