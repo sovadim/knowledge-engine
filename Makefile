@@ -1,26 +1,33 @@
 .PHONY: demo frontend-init backend-init backend frontend start stop
 
+all: demo
+
 demo: start
-	cd demo && uv sync
-	cd demo && uv run python main.py
+	@echo "Loading demo..."
+	@cd demo && uv sync
+	@cd demo && uv run python main.py
+	@echo "Demo data loaded"
 
 frontend-init:
-	cd frontend && npm install
+	@cd frontend && npm install
 
 frontend: frontend-init
-	cd frontend && npm run dev &
-	@echo "Frontend started"
+	@echo "Starting frontend..."
+	@cd frontend && npm run dev &
+	@echo "Frontend started http://localhost:5173"
 
 backend-init:
-	cd backend && uv sync
+	@cd backend && uv sync
 
 backend:
-	cd backend && uv run uvicorn main:app --reload &
-	@echo "Backend started"
+	@echo "Starting backend..."
+	@cd backend && uv run uvicorn main:app --reload &
+	@echo "Backend started on http://localhost:8000"
 
 start: backend frontend
 
 stop:
+	@echo "Stopping backend and frontend..."
 	@pkill -f "uvicorn main:app" || true
 	@pkill -f "npm run dev" || true
 	@echo "Backend and frontend stopped"
