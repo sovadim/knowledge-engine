@@ -35,3 +35,17 @@ $ make stop    # stop backend
 $ make frontend # setup frontend project and run it
 $ make stop     # stop frontend
 ```
+
+## Navigation
+
+* Frontend runs on: http://localhost:5173
+* Backend runs on http://localhost:8000
+
+App consists of 2 main pages:
+
+* AI chat: http://localhost:5173/chat
+* Graph view: http://localhost:5173/graph
+
+Useful backend endpoints:
+
+* API documentation: http://localhost:8000/docs
