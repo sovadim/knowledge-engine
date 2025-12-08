@@ -233,9 +233,7 @@ function Graph() {
     name: '',
     level: NodeLevel.A1,
     question: '',
-    criteria_a1: '',
-    criteria_a2: '',
-    criteria_a3: '',
+    criteria: ''
   });
 
   // Load nodes from backend
@@ -334,14 +332,12 @@ function Graph() {
         child_nodes: [],
         parent_nodes: [],
         question: newNodeData.question.trim() || undefined,
-        criteria_a1: newNodeData.criteria_a1.trim() || undefined,
-        criteria_a2: newNodeData.criteria_a2.trim() || undefined,
-        criteria_a3: newNodeData.criteria_a3.trim() || undefined,
+        criteria: newNodeData.criteria.trim() || undefined
       };
 
       await api.createNode(newNode);
       setShowCreateNodeDialog(false);
-      setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria_a1: '', criteria_a2: '', criteria_a3: '' });
+      setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria: ''});
       await loadNodes();
     } catch (err) {
       console.error('Error creating node:', err);
@@ -365,16 +361,14 @@ function Graph() {
         name: newNodeData.name,
         level: newNodeData.level,
         question: newNodeData.question.trim() || undefined,
-        criteria_a1: newNodeData.criteria_a1.trim() || undefined,
-        criteria_a2: newNodeData.criteria_a2.trim() || undefined,
-        criteria_a3: newNodeData.criteria_a3.trim() || undefined,
+        criteria: newNodeData.criteria.trim() || undefined,
       };
 
       // Use createNode API which also works for updates (backend overwrites by id)
       await api.createNode(updatedNode);
       setShowEditNodeDialog(false);
       setEditingNodeId(null);
-      setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria_a1: '', criteria_a2: '', criteria_a3: '' });
+      setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria: '' });
       await loadNodes();
     } catch (err) {
       console.error('Error editing node:', err);
@@ -391,9 +385,7 @@ function Graph() {
         name: node.name,
         level: node.level,
         question: node.question || '',
-        criteria_a1: node.criteria_a1 || '',
-        criteria_a2: node.criteria_a2 || '',
-        criteria_a3: node.criteria_a3 || '',
+        criteria: node.criteria || '',
       });
       setShowEditNodeDialog(true);
       setContextMenu(null);
@@ -658,7 +650,7 @@ function Graph() {
             }}
             onClick={() => {
               setShowCreateNodeDialog(false);
-              setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria_a1: '', criteria_a2: '', criteria_a3: '' });
+              setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria: '' });
             }}
           />
           {/* Dialog */}
@@ -749,9 +741,9 @@ function Graph() {
               Criteria A1 (optional):
             </label>
             <textarea
-              value={newNodeData.criteria_a1}
+              value={newNodeData.criteria}
               onChange={(e) =>
-                setNewNodeData({ ...newNodeData, criteria_a1: e.target.value })
+                setNewNodeData({ ...newNodeData, criteria: e.target.value })
               }
               style={{
                 width: '100%',
@@ -761,54 +753,14 @@ function Graph() {
                 minHeight: '60px',
                 resize: 'vertical',
               }}
-              placeholder="Enter A1 level criteria"
-            />
-          </div>
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px' }}>
-              Criteria A2 (optional):
-            </label>
-            <textarea
-              value={newNodeData.criteria_a2}
-              onChange={(e) =>
-                setNewNodeData({ ...newNodeData, criteria_a2: e.target.value })
-              }
-              style={{
-                width: '100%',
-                padding: '8px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                minHeight: '60px',
-                resize: 'vertical',
-              }}
-              placeholder="Enter A2 level criteria"
-            />
-          </div>
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px' }}>
-              Criteria A3 (optional):
-            </label>
-            <textarea
-              value={newNodeData.criteria_a3}
-              onChange={(e) =>
-                setNewNodeData({ ...newNodeData, criteria_a3: e.target.value })
-              }
-              style={{
-                width: '100%',
-                padding: '8px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                minHeight: '60px',
-                resize: 'vertical',
-              }}
-              placeholder="Enter A3 level criteria"
+              placeholder="Enter evaluation criteria"
             />
           </div>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
             <button
               onClick={() => {
                 setShowCreateNodeDialog(false);
-                setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria_a1: '', criteria_a2: '', criteria_a3: '' });
+                setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria: '' });
               }}
               style={{
                 padding: '8px 16px',
@@ -856,7 +808,7 @@ function Graph() {
             onClick={() => {
               setShowEditNodeDialog(false);
               setEditingNodeId(null);
-              setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria_a1: '', criteria_a2: '', criteria_a3: '' });
+              setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria: '' });
             }}
           />
           {/* Dialog */}
@@ -947,9 +899,9 @@ function Graph() {
               Criteria A1 (optional):
             </label>
             <textarea
-              value={newNodeData.criteria_a1}
+              value={newNodeData.criteria}
               onChange={(e) =>
-                setNewNodeData({ ...newNodeData, criteria_a1: e.target.value })
+                setNewNodeData({ ...newNodeData, criteria: e.target.value })
               }
               style={{
                 width: '100%',
@@ -959,47 +911,7 @@ function Graph() {
                 minHeight: '60px',
                 resize: 'vertical',
               }}
-              placeholder="Enter A1 level criteria"
-            />
-          </div>
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px' }}>
-              Criteria A2 (optional):
-            </label>
-            <textarea
-              value={newNodeData.criteria_a2}
-              onChange={(e) =>
-                setNewNodeData({ ...newNodeData, criteria_a2: e.target.value })
-              }
-              style={{
-                width: '100%',
-                padding: '8px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                minHeight: '60px',
-                resize: 'vertical',
-              }}
-              placeholder="Enter A2 level criteria"
-            />
-          </div>
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px' }}>
-              Criteria A3 (optional):
-            </label>
-            <textarea
-              value={newNodeData.criteria_a3}
-              onChange={(e) =>
-                setNewNodeData({ ...newNodeData, criteria_a3: e.target.value })
-              }
-              style={{
-                width: '100%',
-                padding: '8px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                minHeight: '60px',
-                resize: 'vertical',
-              }}
-              placeholder="Enter A3 level criteria"
+              placeholder="Enter evaluation criteria"
             />
           </div>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
@@ -1007,7 +919,7 @@ function Graph() {
               onClick={() => {
                 setShowEditNodeDialog(false);
                 setEditingNodeId(null);
-                setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria_a1: '', criteria_a2: '', criteria_a3: '' });
+                setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria: '' });
               }}
               style={{
                 padding: '8px 16px',
