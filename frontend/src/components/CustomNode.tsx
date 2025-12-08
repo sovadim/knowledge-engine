@@ -53,14 +53,11 @@ function CustomNode({ data, selected }: CustomNodeProps) {
       }}
     >
       <Handle type="target" position={Position.Top} style={{ background: '#555' }} />
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontWeight: 'bold', marginBottom: '4px', fontSize: '14px' }}>
-          {data.label}
-        </div>
-        <div style={{ fontSize: '12px', opacity: 0.9 }}>
-          {data.level} • {data.status}
-        </div>
-      </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '14px' }}>
+                {data.label}
+              </div>
+            </div>
       <Handle type="source" position={Position.Bottom} style={{ background: '#555' }} />
     </div>
   );

@@ -5,11 +5,24 @@ const API_BASE_URL = 'http://localhost:8000';
 export const api = {
   // Nodes
   getNodes: async (): Promise<Node[]> => {
-    const response = await fetch(`${API_BASE_URL}/api/nodes`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch nodes');
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/nodes`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
+        throw new Error(`Failed to fetch nodes: ${errorText}`);
+      }
+      return response.json();
+    } catch (error) {
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Network error: Could not connect to the server. Please make sure the backend is running on http://localhost:8000');
+      }
+      throw error;
     }
-    return response.json();
   },
 
   getNode: async (nodeId: number): Promise<Node> => {
@@ -87,40 +100,114 @@ export const api = {
   },
 
   // Chat
-  startChat: async (): Promise<{ question: string }> => {
-    const response = await fetch(`${API_BASE_URL}/api/chat/start`, {
-      method: 'POST',
-    });
-    if (!response.ok) {
-      throw new Error('Failed to start chat');
-    }
-    return response.json();
-  },
-
-  sendAnswer: async (answer: string): Promise<{ question: string }> => {
-    // FastAPI expects answer as a query parameter
-    const response = await fetch(
-      `${API_BASE_URL}/api/chat/answer?answer=${encodeURIComponent(answer)}`,
-      {
+  startChat: async (): Promise<{ question: string; session_id?: string }> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/chat/start`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
+        let errorMessage = 'Failed to start chat';
+        try {
+          const errorJson = JSON.parse(errorText);
+          if (errorJson.detail) {
+            errorMessage = errorJson.detail;
+          }
+        } catch {
+          if (errorText) {
+            errorMessage = errorText;
+          }
+        }
+        throw new Error(errorMessage);
       }
-    );
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('API Error:', errorText);
-      throw new Error('Failed to send answer');
+      return response.json();
+    } catch (error) {
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Network error: Could not connect to the server. Please make sure the backend is running on http://localhost:8000');
+      }
+      throw error;
     }
-    return response.json();
   },
 
-  stopChat: async (): Promise<{ message: string }> => {
-    const response = await fetch(`${API_BASE_URL}/api/chat/stop`, {
-      method: 'POST',
-    });
-    if (!response.ok) {
-      throw new Error('Failed to stop chat');
+  sendAnswer: async (answer: string, sessionId: string): Promise<{ question: string; session_id?: string; completed?: boolean }> => {
+    // FastAPI expects answer as query parameter
+    try {
+      // Build URL with answer (required) and optional session_id
+      let url = `${API_BASE_URL}/api/chat/answer?answer=${encodeURIComponent(answer)}`;
+      if (sessionId) {
+        url += `&session_id=${encodeURIComponent(sessionId)}`;
+      }
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
+        let errorMessage = 'Failed to send answer';
+        try {
+          const errorJson = JSON.parse(errorText);
+          if (errorJson.detail) {
+            errorMessage = errorJson.detail;
+          }
+        } catch {
+          if (errorText) {
+            errorMessage = errorText;
+          }
+        }
+        throw new Error(errorMessage);
+      }
+      return response.json();
+    } catch (error) {
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Network error: Could not connect to the server. Please make sure the backend is running on http://localhost:8000');
+      }
+      throw error;
     }
-    return response.json();
+  },
+
+  stopChat: async (sessionId: string): Promise<{ message: string; session_id?: string }> => {
+    try {
+      const url = sessionId
+        ? `${API_BASE_URL}/api/chat/stop?session_id=${encodeURIComponent(sessionId)}`
+        : `${API_BASE_URL}/api/chat/stop`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
+        let errorMessage = 'Failed to stop chat';
+        try {
+          const errorJson = JSON.parse(errorText);
+          if (errorJson.detail) {
+            errorMessage = errorJson.detail;
+          }
+        } catch {
+          if (errorText) {
+            errorMessage = errorText;
+          }
+        }
+        throw new Error(errorMessage);
+      }
+      return response.json();
+    } catch (error) {
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Network error: Could not connect to the server. Please make sure the backend is running on http://localhost:8000');
+      }
+      throw error;
+    }
   },
 };
 
