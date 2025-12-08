@@ -88,7 +88,8 @@ const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
     const x = startX + siblingIndex * horizontalSpacing;
     
     // Calculate y position based on level (vertical growth from top)
-    const y = level * verticalSpacing + 150;
+    // Start from top (y=100) and increase downward
+    const y = level * verticalSpacing + 100;
     
     positions.set(nodeId, { x, y });
     
@@ -109,7 +110,6 @@ const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
   
   // Layout all root nodes
   rootNodes.forEach((rootNode, index) => {
-    const children = allChildrenMap.get(rootNode.id) || [];
     layoutNode(rootNode.id, 0, index, rootNodes.length);
   });
   
@@ -120,7 +120,7 @@ const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
       const siblingsAtLevel = Array.from(levelNodes.get(maxLevel + 1) || []).length;
       positions.set(node.id, {
         x: 200 + siblingsAtLevel * 300,
-        y: (maxLevel + 1) * 250 + 150,
+        y: (maxLevel + 1) * 250 + 100,
       });
       if (!levelNodes.has(maxLevel + 1)) {
         levelNodes.set(maxLevel + 1, []);
@@ -160,16 +160,16 @@ const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
   return backendNodes.map((backendNode) => {
     const pos = centeredPositions.get(backendNode.id) || positions.get(backendNode.id) || { x: 200, y: 100 };
     return {
-    id: backendNode.id.toString(),
-    type: 'custom',
+      id: backendNode.id.toString(),
+      type: 'custom',
       position: pos,
-    data: {
-      label: backendNode.name,
-      status: backendNode.status,
-      level: backendNode.level,
-      nodeId: backendNode.id,
-      disabled: backendNode.status === NodeStatus.DISABLED,
-    },
+      data: {
+        label: backendNode.name,
+        status: backendNode.status,
+        level: backendNode.level,
+        nodeId: backendNode.id,
+        disabled: backendNode.status === NodeStatus.DISABLED,
+      },
     };
   });
 };
@@ -184,13 +184,13 @@ const convertToReactFlowEdges = (backendNodes: BackendNode[]): Edge[] => {
     backendNode.child_nodes.forEach((childId) => {
       const edgeId = `e${backendNode.id}-${childId}`;
       if (!edgeSet.has(edgeId)) {
-      edges.push({
+        edges.push({
           id: edgeId,
-        source: backendNode.id.toString(),
-        target: childId.toString(),
-        type: 'smoothstep',
-        animated: backendNode.status === NodeStatus.IN_PROGRESS,
-      });
+          source: backendNode.id.toString(),
+          target: childId.toString(),
+          type: 'smoothstep',
+          animated: backendNode.status === NodeStatus.IN_PROGRESS,
+        });
         edgeSet.add(edgeId);
       }
     });
@@ -507,6 +507,7 @@ function Graph() {
         onPaneClick={onPaneClick}
         nodeTypes={nodeTypes}
         fitView
+        fitViewOptions={{ padding: 0.2, maxZoom: 1.5 }}
         deleteKeyCode={['Delete', 'Backspace']}
         style={{ width: '100%', height: '100%' }}
       >
