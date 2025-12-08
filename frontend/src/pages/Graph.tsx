@@ -160,16 +160,16 @@ const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
   return backendNodes.map((backendNode) => {
     const pos = centeredPositions.get(backendNode.id) || positions.get(backendNode.id) || { x: 200, y: 100 };
     return {
-      id: backendNode.id.toString(),
-      type: 'custom',
+    id: backendNode.id.toString(),
+    type: 'custom',
       position: pos,
-      data: {
-        label: backendNode.name,
-        status: backendNode.status,
-        level: backendNode.level,
-        nodeId: backendNode.id,
-        disabled: backendNode.status === NodeStatus.DISABLED,
-      },
+    data: {
+      label: backendNode.name,
+      status: backendNode.status,
+      level: backendNode.level,
+      nodeId: backendNode.id,
+      disabled: backendNode.status === NodeStatus.DISABLED,
+    },
     };
   });
 };
@@ -184,13 +184,13 @@ const convertToReactFlowEdges = (backendNodes: BackendNode[]): Edge[] => {
     backendNode.child_nodes.forEach((childId) => {
       const edgeId = `e${backendNode.id}-${childId}`;
       if (!edgeSet.has(edgeId)) {
-        edges.push({
+      edges.push({
           id: edgeId,
-          source: backendNode.id.toString(),
-          target: childId.toString(),
-          type: 'smoothstep',
-          animated: backendNode.status === NodeStatus.IN_PROGRESS,
-        });
+        source: backendNode.id.toString(),
+        target: childId.toString(),
+        type: 'smoothstep',
+        animated: backendNode.status === NodeStatus.IN_PROGRESS,
+      });
         edgeSet.add(edgeId);
       }
     });
@@ -246,8 +246,16 @@ function Graph() {
       setNodes(reactFlowNodes);
       setEdges(reactFlowEdges);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load nodes');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load nodes';
+      setError(errorMessage);
       console.error('Error loading nodes:', err);
+      // If it's a network error, provide helpful message
+      if (errorMessage.includes('Network error') || errorMessage.includes('fetch')) {
+        console.error('Backend connection issue. Please ensure:');
+        console.error('1. Backend is running on http://localhost:8000');
+        console.error('2. CORS is configured in the backend');
+        console.error('3. No firewall is blocking the connection');
+      }
     } finally {
       setLoading(false);
     }
@@ -468,14 +476,27 @@ function Graph() {
         padding: '20px', 
         textAlign: 'center',
         width: '100vw',
-        height: '100vh',
-          display: 'flex',
+        height: 'calc(100vh - 60px)',
+        display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#f9fafb'
       }}>
-        <p style={{ color: 'red', fontSize: '18px', marginBottom: '10px' }}>Error: {error}</p>
+        <p style={{ color: 'red', fontSize: '18px', marginBottom: '10px', maxWidth: '600px' }}>
+          Error: {error}
+        </p>
+        {error.includes('Network error') && (
+          <div style={{ marginBottom: '20px', color: '#666', fontSize: '14px', maxWidth: '500px' }}>
+            <p>Please check:</p>
+            <ul style={{ textAlign: 'left', display: 'inline-block' }}>
+              <li>Backend is running on http://localhost:8000</li>
+              <li>Backend has CORS middleware configured</li>
+              <li>No firewall is blocking the connection</li>
+              <li>Try refreshing the page or restarting the frontend dev server</li>
+            </ul>
+          </div>
+        )}
         <button
           onClick={loadNodes}
           style={{

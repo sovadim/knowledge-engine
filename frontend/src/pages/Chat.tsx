@@ -68,14 +68,15 @@ function Chat() {
   };
 
   const handleStop = async () => {
-    if (!sessionId) {
+    if (!isInterviewActive && messages.length === 0) {
       addMessage('assistant', 'No active interview to stop.');
       return;
     }
     
     try {
       setIsLoading(true);
-      const response = await api.stopChat(sessionId);
+      // Backend stub may not require sessionId
+      const response = await api.stopChat(sessionId || '');
       addMessage('assistant', response.message);
       setIsInterviewActive(false);
       setSessionId(null);
@@ -84,7 +85,9 @@ function Chat() {
       window.dispatchEvent(new CustomEvent('graph-refresh'));
     } catch (error) {
       console.error('Error stopping chat:', error);
-      addMessage('assistant', 'Failed to stop the interview.');
+      // Even if API call fails, stop the interview locally
+      setIsInterviewActive(false);
+      addMessage('assistant', 'Interview stopped.');
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +95,7 @@ function Chat() {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading || !isInterviewActive || !sessionId) return;
+    if (!input.trim() || isLoading || !isInterviewActive) return;
 
     const userMessage = input.trim();
     setInput('');
@@ -100,16 +103,22 @@ function Chat() {
 
     try {
       setIsLoading(true);
-      const response = await api.sendAnswer(userMessage, sessionId);
+      // Backend stub may not require sessionId, so we pass it if available
+      const response = await api.sendAnswer(userMessage, sessionId || '');
       if (response && response.question) {
         addMessage('assistant', response.question);
+        
+        // Update session_id if returned
+        if (response.session_id) {
+          setSessionId(response.session_id);
+        }
         
         // Trigger graph refresh by dispatching a custom event
         // The Graph page will listen to this event and refresh
         window.dispatchEvent(new CustomEvent('graph-refresh'));
         
-        // If interview is completed, disable input
-        if (response.completed) {
+        // If interview is completed, disable input and show restart button
+        if (response.completed || response.question.toLowerCase().includes('interview complete') || response.question.toLowerCase().includes('interview finished')) {
           setIsInterviewActive(false);
         }
       } else {
@@ -171,6 +180,16 @@ function Chat() {
                 Stop Interview
               </button>
             </>
+          )}
+          {!isInterviewActive && messages.length > 0 && (
+            <button
+              onClick={handleRestart}
+              disabled={isLoading}
+              className="btn btn-primary"
+              title="Restart Interview"
+            >
+              Restart Interview
+            </button>
           )}
         </div>
       </div>
