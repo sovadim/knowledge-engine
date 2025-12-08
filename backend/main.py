@@ -8,7 +8,7 @@ import uuid
 from fastapi import FastAPI, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from dto import Node, NodeStatus
+from dto import Node, NodeStatus, NodeLevel
 
 
 app = FastAPI()
@@ -275,7 +275,7 @@ def update_node_status(node_id: int, passed: bool, level_achieved: Optional[str]
 
 
 @app.post("/api/chat/start")
-def chat_start():
+def chat_start(level: NodeLevel = Query(..., description="Interview level: A1, A2, or A3")):
     """
     Start the interview. Returns the first question.
     """
@@ -302,8 +302,12 @@ def chat_start():
     interview_state[session_id]["current_node_id"] = first_node.id
     
     return {
+<<<<<<< Updated upstream
         "question": first_node.question,
         "session_id": session_id,
+=======
+        "question": f"stub message: the first question for level {level.value}"
+>>>>>>> Stashed changes
     }
 
 
