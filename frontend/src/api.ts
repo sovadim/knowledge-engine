@@ -87,7 +87,7 @@ export const api = {
   },
 
   // Chat
-  startChat: async (): Promise<{ question: string }> => {
+  startChat: async (): Promise<{ question: string; session_id?: string }> => {
     const response = await fetch(`${API_BASE_URL}/api/chat/start`, {
       method: 'POST',
     });
@@ -97,10 +97,10 @@ export const api = {
     return response.json();
   },
 
-  sendAnswer: async (answer: string): Promise<{ question: string }> => {
-    // FastAPI expects answer as a query parameter
+  sendAnswer: async (answer: string, sessionId: string): Promise<{ question: string; session_id?: string; completed?: boolean }> => {
+    // FastAPI expects answer and session_id as query parameters
     const response = await fetch(
-      `${API_BASE_URL}/api/chat/answer?answer=${encodeURIComponent(answer)}`,
+      `${API_BASE_URL}/api/chat/answer?answer=${encodeURIComponent(answer)}&session_id=${encodeURIComponent(sessionId)}`,
       {
         method: 'POST',
       }
@@ -113,10 +113,13 @@ export const api = {
     return response.json();
   },
 
-  stopChat: async (): Promise<{ message: string }> => {
-    const response = await fetch(`${API_BASE_URL}/api/chat/stop`, {
-      method: 'POST',
-    });
+  stopChat: async (sessionId: string): Promise<{ message: string; session_id?: string }> => {
+    const response = await fetch(
+      `${API_BASE_URL}/api/chat/stop?session_id=${encodeURIComponent(sessionId)}`,
+      {
+        method: 'POST',
+      }
+    );
     if (!response.ok) {
       throw new Error('Failed to stop chat');
     }
