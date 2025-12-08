@@ -6,10 +6,10 @@
     "level": "A1",
     "child_nodes": [2, 3, 4],
     "parent_nodes": [],
-    "question": null,
-    "criteria_a1": null,
-    "criteria_a2": null,
-    "criteria_a3": null
+    "question": "What is Java programming language?",
+    "criteria_a1": "Java is an object-oriented programming language.",
+    "criteria_a2": "Java is an object-oriented programming language that runs on the Java Virtual Machine (JVM) and follows the write once, run anywhere principle.",
+    "criteria_a3": "Java is a high-level, object-oriented programming language developed by Sun Microsystems (now Oracle). It uses the Java Virtual Machine (JVM) for platform independence, supports automatic memory management through garbage collection, and follows the write once, run anywhere (WORA) principle. It's widely used for enterprise applications, Android development, and web services."
   },
   {
     "id": 2,

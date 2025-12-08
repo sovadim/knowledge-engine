@@ -45,8 +45,13 @@ def get_next_question_node(session_id: str) -> Optional[Node]:
                 if child_id not in visited:
                     child_node = nodes.get(child_id)
                     if child_node and child_node.question:
-                        # Check if all parents are visited
-                        if all(parent_id in visited for parent_id in child_node.parent_nodes):
+                        # Check if all parents are visited or have no questions (can be skipped)
+                        can_ask = all(
+                            parent_id in visited or 
+                            (nodes.get(parent_id) and not nodes[parent_id].question)
+                            for parent_id in child_node.parent_nodes
+                        )
+                        if can_ask:
                             return child_node
     
     # Find next unvisited root node with a question
@@ -55,11 +60,35 @@ def get_next_question_node(session_id: str) -> Optional[Node]:
         if root.id not in visited:
             return root
     
+    # If no root nodes have questions, find children of root nodes that have questions
+    # This handles the case where root nodes don't have questions but their children do
+    root_nodes_all = [node for node in nodes.values() if not node.parent_nodes]
+    for root in root_nodes_all:
+        if root.id not in visited:
+            # Check children of this root
+            for child_id in root.child_nodes:
+                if child_id not in visited:
+                    child_node = nodes.get(child_id)
+                    if child_node and child_node.question:
+                        # Check if all parents are visited or have no questions
+                        can_ask = all(
+                            parent_id in visited or 
+                            (nodes.get(parent_id) and not nodes[parent_id].question)
+                            for parent_id in child_node.parent_nodes
+                        )
+                        if can_ask:
+                            return child_node
+    
     # Find any unvisited node with a question (breadth-first approach)
     for node in nodes.values():
         if node.id not in visited and node.question:
-            # Check if all parents are visited
-            if all(parent_id in visited for parent_id in node.parent_nodes):
+            # Check if all parents are visited or have no questions (can be skipped)
+            can_ask = all(
+                parent_id in visited or 
+                (nodes.get(parent_id) and not nodes[parent_id].question)
+                for parent_id in node.parent_nodes
+            )
+            if can_ask:
                 return node
     
     return None
