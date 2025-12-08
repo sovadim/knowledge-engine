@@ -1,10 +1,10 @@
-from typing import Dict, List
+from typing import List
 
 from fastapi import FastAPI, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from dto import Node, NodeStatus
-
+from graph import Graph
 
 app = FastAPI()
 
@@ -19,19 +19,19 @@ app.add_middleware(
     expose_headers=["*"],
 )
 
-nodes: Dict[int, Node] = {}
+graph: Graph = Graph()
 
 
 @app.get("/api/nodes", response_model=List[Node])
 def list_nodes() -> List[Node]:
     """Return all nodes."""
-    return list(nodes.values())
+    return graph.get_nodes()
 
 
 @app.get("/api/nodes/{node_id}", response_model=Node)
 def get_node(node_id: int) -> Node:
     """Return a single node by id."""
-    node = nodes.get(node_id)
+    node = graph.get(node_id)
     if not node:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -44,45 +44,33 @@ def get_node(node_id: int) -> Node:
 def create_node(payload: Node) -> Node:
     """Create a new node."""
     node = Node(**payload.model_dump())
-    nodes[node.id] = node
+    graph.add_node(node)
     return node
 
 
 @app.delete("/api/nodes/{node_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_node(node_id: int) -> None:
     """Delete a node by id."""
-    if node_id not in nodes:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Node {node_id} not found",
-        )
-    del nodes[node_id]
-    return None
+    graph.delete(node_id)
 
 
 @app.post("/api/edge", status_code=status.HTTP_201_CREATED)
 def create_edge(from_id: int = Query(..., alias="from"), 
                 to_id: int = Query(..., alias="to")):
     """Create a directed edge: from_id → to_id"""
-    if from_id not in nodes:
+    if from_id not in graph:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Node {from_id} not found",
         )
-    if to_id not in nodes:
+
+    if to_id not in graph:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Node {to_id} not found",
         )
 
-    src = nodes[from_id]
-    dst = nodes[to_id]
-
-    # Avoid duplicates
-    if to_id not in src.child_nodes:
-        src.child_nodes.append(to_id)
-    if from_id not in dst.parent_nodes:
-        dst.parent_nodes.append(from_id)
+    graph.add_edge(from_id, to_id)
 
     return {"message": f"Edge {from_id} -> {to_id} created"}
 
@@ -91,33 +79,25 @@ def create_edge(from_id: int = Query(..., alias="from"),
 def delete_edge(from_id: int = Query(..., alias="from"), 
                 to_id: int = Query(..., alias="to")):
     """Delete a directed edge: from_id → to_id"""
-    if from_id not in nodes:
+    if from_id not in graph:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Node {from_id} not found",
         )
-    if to_id not in nodes:
+
+    if to_id not in graph:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Node {to_id} not found",
         )
 
-    src = nodes[from_id]
-    dst = nodes[to_id]
-
-    # Remove if exists
-    if to_id in src.child_nodes:
-        src.child_nodes.remove(to_id)
-    if from_id in dst.parent_nodes:
-        dst.parent_nodes.remove(from_id)
-
-    return None
+    graph.delete_edge(from_id, to_id)
 
 
 @app.post("/api/nodes/{node_id}/disable", status_code=status.HTTP_204_NO_CONTENT)
 def disable_node(node_id: int) -> None:
     """Set node status to 'disabled'."""
-    node = nodes.get(node_id)
+    node = graph(node_id)
     if not node:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -131,7 +111,7 @@ def disable_node(node_id: int) -> None:
 @app.post("/api/nodes/{node_id}/enable", status_code=status.HTTP_204_NO_CONTENT)
 def enable_node(node_id: int) -> None:
     """Set node status to 'not_reached'."""
-    node = nodes.get(node_id)
+    node = graph(node_id)
     if not node:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
