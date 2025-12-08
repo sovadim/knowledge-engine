@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { api } from '../api';
+import { NodeLevel } from '../types';
 import './Chat.css';
 
 interface Message {
@@ -15,6 +16,7 @@ function Chat() {
   const [isLoading, setIsLoading] = useState(false);
   const [isInterviewActive, setIsInterviewActive] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [selectedLevel, setSelectedLevel] = useState<NodeLevel | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -44,12 +46,16 @@ function Chat() {
   };
 
   const handleStart = async () => {
+    if (!selectedLevel) {
+      addMessage('assistant', 'Please select a level (A1, A2, or A3) before starting the interview.');
+      return;
+    }
     try {
       setIsLoading(true);
       setIsInterviewActive(true);
       setMessages([]);
       setSessionId(null);
-      const response = await api.startChat();
+      const response = await api.startChat(selectedLevel);
       if (response.session_id) {
         setSessionId(response.session_id);
       }
@@ -57,6 +63,7 @@ function Chat() {
     } catch (error) {
       console.error('Error starting chat:', error);
       addMessage('assistant', 'Failed to start the interview. Please try again.');
+      setIsInterviewActive(false);
     } finally {
       setIsLoading(false);
     }
@@ -152,14 +159,49 @@ function Chat() {
         <h1>Knowledge Assessment Interview</h1>
         <div className="chat-controls">
           {!isInterviewActive && messages.length === 0 && (
-            <button
-              onClick={handleStart}
-              disabled={isLoading}
-              className="btn btn-primary"
-              title="Start Interview"
-            >
-              Start Interview
-            </button>
+            <>
+              <div style={{ 
+                display: 'flex', 
+                gap: '10px', 
+                alignItems: 'center',
+                marginRight: '10px'
+              }}>
+                <span style={{ fontWeight: '500', color: '#374151' }}>Select Level:</span>
+                {[NodeLevel.A1, NodeLevel.A2, NodeLevel.A3].map((level) => (
+                  <button
+                    key={level}
+                    onClick={() => setSelectedLevel(level)}
+                    disabled={isLoading}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: selectedLevel === level ? '#3b82f6' : '#e5e7eb',
+                      color: selectedLevel === level ? 'white' : '#374151',
+                      border: `2px solid ${selectedLevel === level ? '#3b82f6' : '#d1d5db'}`,
+                      borderRadius: '6px',
+                      cursor: isLoading ? 'not-allowed' : 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      transition: 'all 0.2s',
+                    }}
+                    title={`Select ${level} level`}
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={handleStart}
+                disabled={isLoading || !selectedLevel}
+                className="btn btn-primary"
+                title="Start Interview"
+                style={{
+                  opacity: !selectedLevel ? 0.5 : 1,
+                  cursor: !selectedLevel ? 'not-allowed' : 'pointer',
+                }}
+              >
+                Start Interview
+              </button>
+            </>
           )}
           {isInterviewActive && (
             <>
@@ -198,7 +240,7 @@ function Chat() {
         {messages.length === 0 && !isLoading && (
           <div className="chat-welcome">
             <p>Welcome to the Knowledge Assessment Interview!</p>
-            <p>Click "Start Interview" to begin.</p>
+            <p>Please select your level (A1, A2, or A3) and click "Start Interview" to begin.</p>
           </div>
         )}
         {messages.map((message) => (
