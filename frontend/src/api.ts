@@ -74,6 +74,38 @@ export const api = {
     }
   },
 
+  resetAllNodes: async (): Promise<void> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/nodes/reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
+        let errorMessage = 'Failed to reset nodes';
+        try {
+          const errorJson = JSON.parse(errorText);
+          if (errorJson.detail) {
+            errorMessage = errorJson.detail;
+          }
+        } catch {
+          if (errorText) {
+            errorMessage = errorText;
+          }
+        }
+        throw new Error(errorMessage);
+      }
+    } catch (error) {
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Network error: Could not connect to the server. Please make sure the backend is running on http://localhost:8000');
+      }
+      throw error;
+    }
+  },
+
   // Edges
   createEdge: async (fromId: number, toId: number): Promise<void> => {
     const response = await fetch(

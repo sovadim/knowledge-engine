@@ -47,15 +47,15 @@ function FitViewButton() {
 const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
   // Find root nodes (nodes with no parents)
   const rootNodes = backendNodes.filter(node => node.parent_nodes.length === 0);
-  
+
   // Create a map for quick lookup
   const nodeMap = new Map(backendNodes.map(node => [node.id, node]));
-  
+
   // Calculate positions using a top-down hierarchical layout
   const positions = new Map<number, { x: number; y: number }>();
   const visited = new Set<number>();
   const levelNodes = new Map<number, number[]>(); // Track nodes at each level
-  
+
   // Build a map of all children for each node (including from parent_nodes relationships)
   const allChildrenMap = new Map<number, number[]>();
   backendNodes.forEach((node) => {
@@ -68,51 +68,51 @@ const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
     });
     allChildrenMap.set(node.id, Array.from(children));
   });
-  
+
   // Calculate positions for nodes at each level
   const layoutNode = (nodeId: number, level: number, siblingIndex: number, totalSiblings: number) => {
     if (visited.has(nodeId)) return;
     visited.add(nodeId);
-    
+
     const node = nodeMap.get(nodeId);
     if (!node) return;
-    
+
     // Top-down layout: Y increases with depth, X for horizontal spacing
     const horizontalSpacing = 300;
     const verticalSpacing = 250;
-    
+
     // Calculate x position - center siblings horizontally
     const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
     const totalWidth = Math.max(0, (totalSiblings - 1) * horizontalSpacing);
     const startX = (screenWidth - totalWidth) / 2;
     const x = startX + siblingIndex * horizontalSpacing;
-    
+
     // Calculate y position based on level (vertical growth from top)
     // Start from top (y=100) and increase downward
     const y = level * verticalSpacing + 100;
-    
+
     positions.set(nodeId, { x, y });
-    
+
     // Track nodes at this level
     if (!levelNodes.has(level)) {
       levelNodes.set(level, []);
     }
     levelNodes.get(level)!.push(nodeId);
-    
+
     // Get all children (from the map we built)
     const allChildren = allChildrenMap.get(nodeId) || [];
-    
+
     // Layout children
     allChildren.forEach((childId, childIndex) => {
       layoutNode(childId, level + 1, childIndex, allChildren.length);
     });
   };
-  
+
   // Layout all root nodes
   rootNodes.forEach((rootNode, index) => {
     layoutNode(rootNode.id, 0, index, rootNodes.length);
   });
-  
+
   // Handle any remaining unvisited nodes (shouldn't happen, but just in case)
   backendNodes.forEach((node) => {
     if (!visited.has(node.id)) {
@@ -128,24 +128,24 @@ const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
       levelNodes.get(maxLevel + 1)!.push(node.id);
     }
   });
-  
+
   // Center nodes at each level horizontally
   const centeredPositions = new Map<number, { x: number; y: number }>();
-  
+
   levelNodes.forEach((nodeIds, level) => {
     if (nodeIds.length === 0) return;
-    
+
     // Calculate total width needed for this level
     const nodePositions = nodeIds.map(id => positions.get(id)!);
     const minX = Math.min(...nodePositions.map(p => p.x));
     const maxX = Math.max(...nodePositions.map(p => p.x));
     const levelWidth = maxX - minX;
-    
+
     // Center the level
     const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
     const centerX = screenWidth / 2;
     const offsetX = centerX - (minX + levelWidth / 2);
-    
+
     // Apply offset to all nodes at this level
     nodeIds.forEach((nodeId) => {
       const originalPos = positions.get(nodeId)!;
@@ -155,7 +155,7 @@ const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
       });
     });
   });
-  
+
   // Use centered positions if available, otherwise use original positions
   return backendNodes.map((backendNode) => {
     const pos = centeredPositions.get(backendNode.id) || positions.get(backendNode.id) || { x: 200, y: 100 };
@@ -178,7 +178,7 @@ const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
 const convertToReactFlowEdges = (backendNodes: BackendNode[]): Edge[] => {
   const edges: Edge[] = [];
   const edgeSet = new Set<string>(); // Track edges to avoid duplicates
-  
+
   backendNodes.forEach((backendNode) => {
     // Create edges from child_nodes (parent -> child)
     backendNode.child_nodes.forEach((childId) => {
@@ -194,7 +194,7 @@ const convertToReactFlowEdges = (backendNodes: BackendNode[]): Edge[] => {
         edgeSet.add(edgeId);
       }
     });
-    
+
     // Also create edges from parent_nodes (ensures all relationships are shown)
     // This handles cases where a node has a parent but parent doesn't list it in child_nodes
     backendNode.parent_nodes.forEach((parentId) => {
@@ -211,7 +211,7 @@ const convertToReactFlowEdges = (backendNodes: BackendNode[]): Edge[] => {
       }
     });
   });
-  
+
   return edges;
 };
 
@@ -221,6 +221,8 @@ function Graph() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreateNodeDialog, setShowCreateNodeDialog] = useState(false);
+  const [showEditNodeDialog, setShowEditNodeDialog] = useState(false);
+  const [editingNodeId, setEditingNodeId] = useState<number | null>(null);
   const [contextMenu, setContextMenu] = useState<{
     nodeId: number | null;
     edgeId: string | null;
@@ -230,6 +232,10 @@ function Graph() {
   const [newNodeData, setNewNodeData] = useState({
     name: '',
     level: NodeLevel.A1,
+    question: '',
+    criteria_a1: '',
+    criteria_a2: '',
+    criteria_a3: '',
   });
 
   // Load nodes from backend
@@ -270,7 +276,7 @@ function Graph() {
     const handleRefresh = () => {
       loadNodes();
     };
-    
+
     window.addEventListener('graph-refresh', handleRefresh);
     return () => {
       window.removeEventListener('graph-refresh', handleRefresh);
@@ -285,7 +291,7 @@ function Graph() {
       // Prevent connecting disabled nodes
       const sourceNode = nodes.find(n => n.id === params.source);
       const targetNode = nodes.find(n => n.id === params.target);
-      
+
       if (sourceNode?.data.disabled || targetNode?.data.disabled) {
         alert('Cannot connect disabled nodes');
         return;
@@ -295,7 +301,7 @@ function Graph() {
         const sourceId = parseInt(params.source);
         const targetId = parseInt(params.target);
         await api.createEdge(sourceId, targetId);
-        
+
         // Reload nodes to get updated edges
         await loadNodes();
       } catch (err) {
@@ -315,7 +321,7 @@ function Graph() {
 
     try {
       // Generate a new ID (in a real app, the backend should handle this)
-      const maxId = nodes.length > 0 
+      const maxId = nodes.length > 0
         ? Math.max(...nodes.map(n => parseInt(n.id)))
         : 0;
       const newId = maxId + 1;
@@ -327,17 +333,75 @@ function Graph() {
         level: newNodeData.level,
         child_nodes: [],
         parent_nodes: [],
+        question: newNodeData.question.trim() || undefined,
+        criteria_a1: newNodeData.criteria_a1.trim() || undefined,
+        criteria_a2: newNodeData.criteria_a2.trim() || undefined,
+        criteria_a3: newNodeData.criteria_a3.trim() || undefined,
       };
 
       await api.createNode(newNode);
       setShowCreateNodeDialog(false);
-      setNewNodeData({ name: '', level: NodeLevel.A1 });
+      setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria_a1: '', criteria_a2: '', criteria_a3: '' });
       await loadNodes();
     } catch (err) {
       console.error('Error creating node:', err);
       alert('Failed to create node');
     }
   }, [newNodeData, nodes, loadNodes]);
+
+  // Handle node editing
+  const handleEditNode = useCallback(async () => {
+    if (!editingNodeId || !newNodeData.name.trim()) {
+      alert('Please enter a node name');
+      return;
+    }
+
+    try {
+      // Get the existing node to preserve relationships
+      const existingNode = await api.getNode(editingNodeId);
+
+      const updatedNode: BackendNode = {
+        ...existingNode,
+        name: newNodeData.name,
+        level: newNodeData.level,
+        question: newNodeData.question.trim() || undefined,
+        criteria_a1: newNodeData.criteria_a1.trim() || undefined,
+        criteria_a2: newNodeData.criteria_a2.trim() || undefined,
+        criteria_a3: newNodeData.criteria_a3.trim() || undefined,
+      };
+
+      // Use createNode API which also works for updates (backend overwrites by id)
+      await api.createNode(updatedNode);
+      setShowEditNodeDialog(false);
+      setEditingNodeId(null);
+      setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria_a1: '', criteria_a2: '', criteria_a3: '' });
+      await loadNodes();
+    } catch (err) {
+      console.error('Error editing node:', err);
+      alert('Failed to edit node');
+    }
+  }, [editingNodeId, newNodeData, loadNodes]);
+
+  // Open edit dialog
+  const handleOpenEditDialog = useCallback(async (nodeId: number) => {
+    try {
+      const node = await api.getNode(nodeId);
+      setEditingNodeId(nodeId);
+      setNewNodeData({
+        name: node.name,
+        level: node.level,
+        question: node.question || '',
+        criteria_a1: node.criteria_a1 || '',
+        criteria_a2: node.criteria_a2 || '',
+        criteria_a3: node.criteria_a3 || '',
+      });
+      setShowEditNodeDialog(true);
+      setContextMenu(null);
+    } catch (err) {
+      console.error('Error loading node for editing:', err);
+      alert('Failed to load node data');
+    }
+  }, []);
 
   // Handle node deletion
   const handleDeleteNode = useCallback(async (nodeId: number) => {
@@ -358,6 +422,7 @@ function Graph() {
   const handleToggleNodeStatus = useCallback(
     async (nodeId: number, isDisabled: boolean) => {
       try {
+        // If node is currently disabled, enable it. Otherwise, disable it.
         if (isDisabled) {
           await api.enableNode(nodeId);
         } else {
@@ -452,8 +517,8 @@ function Graph() {
 
   if (loading) {
     return (
-      <div style={{ 
-        padding: '20px', 
+      <div style={{
+        padding: '20px',
         textAlign: 'center',
         width: '100vw',
         height: '100vh',
@@ -472,8 +537,8 @@ function Graph() {
 
   if (error) {
     return (
-      <div style={{ 
-        padding: '20px', 
+      <div style={{
+        padding: '20px',
         textAlign: 'center',
         width: '100vw',
         height: 'calc(100vh - 60px)',
@@ -495,7 +560,7 @@ function Graph() {
               <li>No firewall is blocking the connection</li>
               <li>Try refreshing the page or restarting the frontend dev server</li>
             </ul>
-          </div>
+      </div>
         )}
         <button
           onClick={loadNodes}
@@ -567,7 +632,7 @@ function Graph() {
         </Panel>
         <Background />
         <Controls />
-        <MiniMap 
+        <MiniMap
           style={{
             position: 'absolute',
             bottom: 10,
@@ -579,19 +644,41 @@ function Graph() {
       </ReactFlow>
 
       {showCreateNodeDialog && (
-        <div
-          style={{
-            position: 'absolute',
+        <>
+          {/* Backdrop */}
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              zIndex: 9999,
+            }}
+            onClick={() => {
+              setShowCreateNodeDialog(false);
+              setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria_a1: '', criteria_a2: '', criteria_a3: '' });
+            }}
+          />
+          {/* Dialog */}
+          <div
+            style={{
+              position: 'fixed',
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            zIndex: 1000,
+              zIndex: 10000,
             backgroundColor: 'white',
             padding: '20px',
             borderRadius: '8px',
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            minWidth: '300px',
+              minWidth: '400px',
+              maxWidth: '600px',
+              maxHeight: '85vh',
+              overflowY: 'auto',
           }}
+            onClick={(e) => e.stopPropagation()}
         >
           <h3 style={{ marginTop: 0 }}>Create New Node</h3>
           <div style={{ marginBottom: '15px' }}>
@@ -637,11 +724,91 @@ function Graph() {
               <option value={NodeLevel.A3}>A3</option>
             </select>
           </div>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px' }}>
+              Question (optional):
+            </label>
+            <textarea
+              value={newNodeData.question}
+              onChange={(e) =>
+                setNewNodeData({ ...newNodeData, question: e.target.value })
+              }
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                minHeight: '80px',
+                resize: 'vertical',
+              }}
+              placeholder="Enter question for this node"
+            />
+          </div>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px' }}>
+              Criteria A1 (optional):
+            </label>
+            <textarea
+              value={newNodeData.criteria_a1}
+              onChange={(e) =>
+                setNewNodeData({ ...newNodeData, criteria_a1: e.target.value })
+              }
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                minHeight: '60px',
+                resize: 'vertical',
+              }}
+              placeholder="Enter A1 level criteria"
+            />
+          </div>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px' }}>
+              Criteria A2 (optional):
+            </label>
+            <textarea
+              value={newNodeData.criteria_a2}
+              onChange={(e) =>
+                setNewNodeData({ ...newNodeData, criteria_a2: e.target.value })
+              }
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                minHeight: '60px',
+                resize: 'vertical',
+              }}
+              placeholder="Enter A2 level criteria"
+            />
+          </div>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px' }}>
+              Criteria A3 (optional):
+            </label>
+            <textarea
+              value={newNodeData.criteria_a3}
+              onChange={(e) =>
+                setNewNodeData({ ...newNodeData, criteria_a3: e.target.value })
+              }
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                minHeight: '60px',
+                resize: 'vertical',
+              }}
+              placeholder="Enter A3 level criteria"
+            />
+          </div>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
             <button
               onClick={() => {
                 setShowCreateNodeDialog(false);
-                setNewNodeData({ name: '', level: NodeLevel.A1 });
+                setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria_a1: '', criteria_a2: '', criteria_a3: '' });
               }}
               style={{
                 padding: '8px 16px',
@@ -669,6 +836,206 @@ function Graph() {
             </button>
           </div>
         </div>
+        </>
+      )}
+
+      {/* Edit Node Dialog */}
+      {showEditNodeDialog && (
+        <>
+          {/* Backdrop */}
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              zIndex: 9999,
+            }}
+            onClick={() => {
+              setShowEditNodeDialog(false);
+              setEditingNodeId(null);
+              setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria_a1: '', criteria_a2: '', criteria_a3: '' });
+            }}
+          />
+          {/* Dialog */}
+          <div
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 10000,
+              backgroundColor: 'white',
+              padding: '20px',
+              borderRadius: '8px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              minWidth: '400px',
+              maxWidth: '600px',
+              maxHeight: '85vh',
+              overflowY: 'auto',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+          <h3 style={{ marginTop: 0, color: '#1f2937'}}>Edit Node</h3>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px' }}>
+              Node Name:
+            </label>
+            <input
+              type="text"
+              value={newNodeData.name}
+              onChange={(e) =>
+                setNewNodeData({ ...newNodeData, name: e.target.value })
+              }
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+              }}
+              placeholder="Enter node name"
+            />
+          </div>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px' }}>
+              Level:
+            </label>
+            <select
+              value={newNodeData.level}
+              onChange={(e) =>
+                setNewNodeData({
+                  ...newNodeData,
+                  level: e.target.value as NodeLevel,
+                })
+              }
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+              }}
+            >
+              <option value={NodeLevel.A1}>A1</option>
+              <option value={NodeLevel.A2}>A2</option>
+              <option value={NodeLevel.A3}>A3</option>
+            </select>
+          </div>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px' }}>
+              Question (optional):
+            </label>
+            <textarea
+              value={newNodeData.question}
+              onChange={(e) =>
+                setNewNodeData({ ...newNodeData, question: e.target.value })
+              }
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                minHeight: '80px',
+                resize: 'vertical',
+              }}
+              placeholder="Enter question for this node"
+            />
+          </div>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px' }}>
+              Criteria A1 (optional):
+            </label>
+            <textarea
+              value={newNodeData.criteria_a1}
+              onChange={(e) =>
+                setNewNodeData({ ...newNodeData, criteria_a1: e.target.value })
+              }
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                minHeight: '60px',
+                resize: 'vertical',
+              }}
+              placeholder="Enter A1 level criteria"
+            />
+          </div>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px' }}>
+              Criteria A2 (optional):
+            </label>
+            <textarea
+              value={newNodeData.criteria_a2}
+              onChange={(e) =>
+                setNewNodeData({ ...newNodeData, criteria_a2: e.target.value })
+              }
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                minHeight: '60px',
+                resize: 'vertical',
+              }}
+              placeholder="Enter A2 level criteria"
+            />
+          </div>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px' }}>
+              Criteria A3 (optional):
+            </label>
+            <textarea
+              value={newNodeData.criteria_a3}
+              onChange={(e) =>
+                setNewNodeData({ ...newNodeData, criteria_a3: e.target.value })
+              }
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                minHeight: '60px',
+                resize: 'vertical',
+              }}
+              placeholder="Enter A3 level criteria"
+            />
+          </div>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+            <button
+              onClick={() => {
+                setShowEditNodeDialog(false);
+                setEditingNodeId(null);
+                setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria_a1: '', criteria_a2: '', criteria_a3: '' });
+              }}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#6b7280',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleEditNode}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+              }}
+            >
+              Save
+            </button>
+          </div>
+        </div>
+        </>
       )}
 
 
@@ -683,7 +1050,7 @@ function Graph() {
             border: '1px solid #ccc',
             borderRadius: '4px',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-            zIndex: 1000,
+            zIndex: 10001,
             minWidth: '150px',
           }}
         >
@@ -691,11 +1058,35 @@ function Graph() {
             <>
               <button
                 onClick={async () => {
+                  await handleOpenEditDialog(contextMenu.nodeId!);
+                }}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  textAlign: 'left',
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  color: '#1f2937',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f3f4f6';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                Edit Node
+              </button>
+              <button
+                onClick={async () => {
                   const node = nodes.find(n => parseInt(n.id) === contextMenu.nodeId);
-                  if (node) {
+                  if (node && node.data) {
+                    const isCurrentlyDisabled = node.data.disabled === true;
                     await handleToggleNodeStatus(
                       contextMenu.nodeId!,
-                      !node.data.disabled
+                      isCurrentlyDisabled
                     );
                   }
                   setContextMenu(null);
@@ -708,6 +1099,7 @@ function Graph() {
                   backgroundColor: 'transparent',
                   cursor: 'pointer',
                   fontSize: '14px',
+                  color: '#1f2937',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = '#f3f4f6';
@@ -716,7 +1108,7 @@ function Graph() {
                   e.currentTarget.style.backgroundColor = 'transparent';
                 }}
               >
-                {nodes.find(n => parseInt(n.id) === contextMenu.nodeId)?.data.disabled
+                {nodes.find(n => parseInt(n.id) === contextMenu.nodeId)?.data?.disabled === true
                   ? 'Enable Node'
                   : 'Disable Node'}
               </button>
