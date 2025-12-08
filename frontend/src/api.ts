@@ -132,9 +132,10 @@ export const api = {
   },
 
   // Chat
-  startChat: async (): Promise<{ question: string; session_id?: string }> => {
+  startChat: async (level: string): Promise<{ question: string; session_id?: string }> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/chat/start`, {
+      const url = `${API_BASE_URL}/api/chat/start?level=${encodeURIComponent(level)}`;
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
