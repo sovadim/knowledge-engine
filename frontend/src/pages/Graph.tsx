@@ -680,7 +680,7 @@ function Graph() {
           }}
             onClick={(e) => e.stopPropagation()}
         >
-          <h3 style={{ marginTop: 0 }}>Create New Node</h3>
+          <h3 style={{ marginTop: 0, color: '#1f2937' }}>Create New Node</h3>
           <div style={{ marginBottom: '15px' }}>
             <label style={{ display: 'block', marginBottom: '5px' }}>
               Node Name:
