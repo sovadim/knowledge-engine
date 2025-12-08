@@ -29,6 +29,4 @@ class Node(BaseModel):
     parent_nodes: List[int] = []
 
     question: Optional[str] = None
-    criteria_a1: Optional[str] = None
-    criteria_a2: Optional[str] = None
-    criteria_a3: Optional[str] = None
+    criteria: Optional[str] = None

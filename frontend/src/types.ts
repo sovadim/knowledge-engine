@@ -20,8 +20,5 @@ export interface Node {
   child_nodes: number[];
   parent_nodes: number[];
   question?: string;
-  criteria_a1?: string;
-  criteria_a2?: string;
-  criteria_a3?: string;
+  criteria?: string;
 }
-

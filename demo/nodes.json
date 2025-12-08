@@ -4,47 +4,33 @@
     "name": "Java",
     "status": "not_reached",
     "level": "A1",
-    "child_nodes": [2, 3, 4],
-    "parent_nodes": [],
-    "question": "What is Java programming language?",
-    "criteria_a1": "Java is an object-oriented programming language.",
-    "criteria_a2": "Java is an object-oriented programming language that runs on the Java Virtual Machine (JVM) and follows the write once, run anywhere principle.",
-    "criteria_a3": "Java is a high-level, object-oriented programming language developed by Sun Microsystems (now Oracle). It uses the Java Virtual Machine (JVM) for platform independence, supports automatic memory management through garbage collection, and follows the write once, run anywhere (WORA) principle. It's widely used for enterprise applications, Android development, and web services."
+    "parent_nodes": []
   },
   {
     "id": 2,
     "name": "Nested class",
     "status": "not_reached",
     "level": "A1",
-    "child_nodes": [],
     "parent_nodes": [1],
     "question": "What is the difference between a static nested class and a non-static inner class?",
-    "criteria_a1": "Static nested class doesn't need an outer class instance; inner class does.",
-    "criteria_a2": "Static nested class can access only static members of the outer class. Inner class can access both static and instance members of the outer class.",
-    "criteria_a3": "Static nested classes behave like regular static members and reduce memory footprint. Inner classes hold an implicit reference to the outer instance, which impacts design and potential memory leaks."
+    "criteria": "User mentioned: Static nested classes behave like regular static members and reduce memory footprint. Inner classes hold an implicit reference to the outer instance, which impacts design and potential memory leaks."
   },
   {
     "id": 3,
     "name": "Packaging",
     "status": "not_reached",
     "level": "A1",
-    "child_nodes": [],
     "parent_nodes": [1],
     "question": "What is the purpose of a Java package?",
-    "criteria_a1": "Packages group classes and avoid name conflicts.",
-    "criteria_a2": "Adds: packaging organizes code logically and controls access (default access).",
-    "criteria_a3": "Adds: explains how packaging supports maintainability, modularization, and clear layering in larger codebases."
+    "criteria": "User mentions: Packages group classes and avoid name conflicts. Packaging organizes code logically and controls access (default access). Explains how packaging supports maintainability, modularization, and clear layering in larger codebases."
   },
   {
     "id": 4,
     "name": "Serialization",
     "status": "not_reached",
     "level": "A1",
-    "child_nodes": [],
     "parent_nodes": [1],
     "question": "What is Java Serialization and why do we use it?",
-    "criteria_a1": "Serialization converts an object into a byte stream so it can be saved or transferred.",
-    "criteria_a2": "Serialization turns an object into bytes to store or send it; useful for caching, saving state, or sending objects over the network.",
-    "criteria_a3": "Serialization is the conversion of object graphs to bytes. Used in distributed systems, persistence, and messaging. Understands limitations and alternatives (JSON )."
+    "criteria": "User mentions: Serialization is the conversion of object graphs to bytes. Used in distributed systems, persistence, and messaging. Understands limitations and alternatives (JSON )."
   }
 ]
