@@ -1,9 +1,4 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
+/* Removed root styles - using index.css for full-window layout */
 
 .logo {
   height: 6em;

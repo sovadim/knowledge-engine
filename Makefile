@@ -1,12 +1,13 @@
-.PHONY: demo frontend-init backend-init backend frontend start stop
+.PHONY: demo up down backend frontend all
 
-all: demo
-
-demo: start
-	@echo "Loading demo..."
-	@cd demo && uv sync
-	@cd demo && uv run python main.py
-	@echo "Demo data loaded"
+demo: up
+	@echo "Waiting for backend to start..."
+	@sleep 2
+	cd demo && uv sync
+	cd demo && uv run python main.py
+	@echo "Demo data loaded. Starting frontend..."
+	@echo "Frontend will be available at http://localhost:5173/graph"
+	cd frontend && npm run dev
 
 frontend-init:
 	@cd frontend && npm install
@@ -19,7 +20,7 @@ frontend: frontend-init
 backend-init:
 	@cd backend && uv sync
 
-backend:
+up: backend
 	@echo "Starting backend..."
 	@cd backend && uv run uvicorn main:app --reload &
 	@echo "Backend started on http://localhost:8000"

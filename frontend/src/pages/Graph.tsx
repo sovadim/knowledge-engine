@@ -43,7 +43,7 @@ function FitViewButton() {
   );
 }
 
-// Simple layout algorithm - arrange nodes in a hierarchical layout
+// Simple layout algorithm - arrange nodes in a hierarchical layout (top-down)
 const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
   // Find root nodes (nodes with no parents)
   const rootNodes = backendNodes.filter(node => node.parent_nodes.length === 0);
@@ -51,55 +51,125 @@ const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
   // Create a map for quick lookup
   const nodeMap = new Map(backendNodes.map(node => [node.id, node]));
   
-  // Calculate positions using a simple hierarchical layout
+  // Calculate positions using a top-down hierarchical layout
   const positions = new Map<number, { x: number; y: number }>();
   const visited = new Set<number>();
+  const levelNodes = new Map<number, number[]>(); // Track nodes at each level
   
-  const layoutNode = (nodeId: number, level: number, index: number) => {
+  // Build a map of all children for each node (including from parent_nodes relationships)
+  const allChildrenMap = new Map<number, number[]>();
+  backendNodes.forEach((node) => {
+    const children = new Set(node.child_nodes);
+    // Also add nodes that have this node as parent
+    backendNodes.forEach((n) => {
+      if (n.parent_nodes.includes(node.id)) {
+        children.add(n.id);
+      }
+    });
+    allChildrenMap.set(node.id, Array.from(children));
+  });
+  
+  // Calculate positions for nodes at each level
+  const layoutNode = (nodeId: number, level: number, siblingIndex: number, totalSiblings: number) => {
     if (visited.has(nodeId)) return;
     visited.add(nodeId);
     
     const node = nodeMap.get(nodeId);
     if (!node) return;
     
-    const x = level * 250 + 100;
-    const y = index * 120 + 100;
+    // Top-down layout: Y increases with depth, X for horizontal spacing
+    const horizontalSpacing = 300;
+    const verticalSpacing = 250;
+    
+    // Calculate x position - center siblings horizontally
+    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+    const totalWidth = Math.max(0, (totalSiblings - 1) * horizontalSpacing);
+    const startX = (screenWidth - totalWidth) / 2;
+    const x = startX + siblingIndex * horizontalSpacing;
+    
+    // Calculate y position based on level (vertical growth from top)
+    const y = level * verticalSpacing + 150;
+    
     positions.set(nodeId, { x, y });
     
+    // Track nodes at this level
+    if (!levelNodes.has(level)) {
+      levelNodes.set(level, []);
+    }
+    levelNodes.get(level)!.push(nodeId);
+    
+    // Get all children (from the map we built)
+    const allChildren = allChildrenMap.get(nodeId) || [];
+    
     // Layout children
-    node.child_nodes.forEach((childId, childIndex) => {
-      layoutNode(childId, level + 1, index * 2 + childIndex);
+    allChildren.forEach((childId, childIndex) => {
+      layoutNode(childId, level + 1, childIndex, allChildren.length);
     });
   };
   
   // Layout all root nodes
   rootNodes.forEach((rootNode, index) => {
-    layoutNode(rootNode.id, 0, index);
+    const children = allChildrenMap.get(rootNode.id) || [];
+    layoutNode(rootNode.id, 0, index, rootNodes.length);
   });
   
-  // Handle orphaned nodes (nodes not connected to any root)
-  backendNodes.forEach((node, index) => {
+  // Handle any remaining unvisited nodes (shouldn't happen, but just in case)
+  backendNodes.forEach((node) => {
     if (!visited.has(node.id)) {
+      const maxLevel = levelNodes.size > 0 ? Math.max(...Array.from(levelNodes.keys())) : 0;
+      const siblingsAtLevel = Array.from(levelNodes.get(maxLevel + 1) || []).length;
       positions.set(node.id, {
-        x: (backendNodes.length + index) % 5 * 200 + 100,
-        y: Math.floor((backendNodes.length + index) / 5) * 150 + 100,
+        x: 200 + siblingsAtLevel * 300,
+        y: (maxLevel + 1) * 250 + 150,
       });
+      if (!levelNodes.has(maxLevel + 1)) {
+        levelNodes.set(maxLevel + 1, []);
+      }
+      levelNodes.get(maxLevel + 1)!.push(node.id);
     }
   });
   
+  // Center nodes at each level horizontally
+  const centeredPositions = new Map<number, { x: number; y: number }>();
+  
+  levelNodes.forEach((nodeIds, level) => {
+    if (nodeIds.length === 0) return;
+    
+    // Calculate total width needed for this level
+    const nodePositions = nodeIds.map(id => positions.get(id)!);
+    const minX = Math.min(...nodePositions.map(p => p.x));
+    const maxX = Math.max(...nodePositions.map(p => p.x));
+    const levelWidth = maxX - minX;
+    
+    // Center the level
+    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+    const centerX = screenWidth / 2;
+    const offsetX = centerX - (minX + levelWidth / 2);
+    
+    // Apply offset to all nodes at this level
+    nodeIds.forEach((nodeId) => {
+      const originalPos = positions.get(nodeId)!;
+      centeredPositions.set(nodeId, {
+        x: originalPos.x + offsetX,
+        y: originalPos.y,
+      });
+    });
+  });
+  
+  // Use centered positions if available, otherwise use original positions
   return backendNodes.map((backendNode) => {
-    const pos = positions.get(backendNode.id) || { x: 100, y: 100 };
+    const pos = centeredPositions.get(backendNode.id) || positions.get(backendNode.id) || { x: 200, y: 100 };
     return {
-      id: backendNode.id.toString(),
-      type: 'custom',
+    id: backendNode.id.toString(),
+    type: 'custom',
       position: pos,
-      data: {
-        label: backendNode.name,
-        status: backendNode.status,
-        level: backendNode.level,
-        nodeId: backendNode.id,
-        disabled: backendNode.status === NodeStatus.DISABLED,
-      },
+    data: {
+      label: backendNode.name,
+      status: backendNode.status,
+      level: backendNode.level,
+      nodeId: backendNode.id,
+      disabled: backendNode.status === NodeStatus.DISABLED,
+    },
     };
   });
 };
@@ -107,17 +177,41 @@ const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
 // Convert backend nodes to React Flow edges
 const convertToReactFlowEdges = (backendNodes: BackendNode[]): Edge[] => {
   const edges: Edge[] = [];
+  const edgeSet = new Set<string>(); // Track edges to avoid duplicates
+  
   backendNodes.forEach((backendNode) => {
+    // Create edges from child_nodes (parent -> child)
     backendNode.child_nodes.forEach((childId) => {
+      const edgeId = `e${backendNode.id}-${childId}`;
+      if (!edgeSet.has(edgeId)) {
       edges.push({
-        id: `e${backendNode.id}-${childId}`,
+          id: edgeId,
         source: backendNode.id.toString(),
         target: childId.toString(),
         type: 'smoothstep',
         animated: backendNode.status === NodeStatus.IN_PROGRESS,
       });
+        edgeSet.add(edgeId);
+      }
+    });
+    
+    // Also create edges from parent_nodes (ensures all relationships are shown)
+    // This handles cases where a node has a parent but parent doesn't list it in child_nodes
+    backendNode.parent_nodes.forEach((parentId) => {
+      const edgeId = `e${parentId}-${backendNode.id}`;
+      if (!edgeSet.has(edgeId)) {
+        edges.push({
+          id: edgeId,
+          source: parentId.toString(),
+          target: backendNode.id.toString(),
+          type: 'smoothstep',
+          animated: backendNode.status === NodeStatus.IN_PROGRESS,
+        });
+        edgeSet.add(edgeId);
+      }
     });
   });
+  
   return edges;
 };
 
@@ -375,14 +469,14 @@ function Graph() {
         textAlign: 'center',
         width: '100vw',
         height: '100vh',
-        display: 'flex',
+          display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#f9fafb'
       }}>
         <p style={{ color: 'red', fontSize: '18px', marginBottom: '10px' }}>Error: {error}</p>
-        <button 
+        <button
           onClick={loadNodes}
           style={{
             padding: '10px 20px',
@@ -401,7 +495,7 @@ function Graph() {
   }
 
   return (
-    <div style={{ width: '100vw', height: 'calc(100vh - 60px)', position: 'relative', backgroundColor: '#f9fafb' }}>
+    <div style={{ width: '100vw', height: 'calc(100vh - 60px)', position: 'relative', backgroundColor: '#f9fafb', margin: 0, padding: 0, overflow: 'hidden' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -428,30 +522,38 @@ function Graph() {
               cursor: 'pointer',
               fontSize: '14px',
               fontWeight: '500',
-            }}
-          >
-            Create Node
-          </button>
-          <button
-            onClick={loadNodes}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: '#6b7280',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              fontSize: '14px',
+          }}
+        >
+          Create Node
+        </button>
+        <button
+          onClick={loadNodes}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#6b7280',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontSize: '14px',
               fontWeight: '500',
-            }}
-          >
-            Refresh
-          </button>
+          }}
+        >
+          Refresh
+        </button>
           <FitViewButton />
         </Panel>
         <Background />
         <Controls />
-        <MiniMap />
+        <MiniMap 
+          style={{
+            position: 'absolute',
+            bottom: 10,
+            right: 10,
+            width: 200,
+            height: 150,
+          }}
+        />
       </ReactFlow>
 
       {showCreateNodeDialog && (
