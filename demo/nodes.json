@@ -30,7 +30,7 @@
     "level": "A1",
     "parent_nodes": [1],
     "question": "What is Java Serialization and why do we use it?",
-    "criteria": "User mentions: Serialization is the conversion of object graphs to bytes. Used in distributed systems, persistence, and messaging. Understands limitations and alternatives (JSON )."
+    "criteria": "User mentions: Serialization is the conversion of object graphs to bytes. Used in distributed systems, persistence, and messaging. Understands limitations and alternatives (JSON)."
   },
   {
     "id": 5,
