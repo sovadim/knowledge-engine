@@ -3,7 +3,7 @@ from typing import List
 from fastapi import FastAPI, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from dto import Node, NodeStatus
+from dto import Node, NodeStatus, NodeLevel
 from graph import Graph
 
 app = FastAPI()
@@ -123,7 +123,7 @@ def enable_node(node_id: int) -> None:
 
 
 @app.post("/api/chat/start")
-def chat_start():
+def chat_start(level: NodeLevel = Query(..., description="Interview level: A1, A2, or A3")):
     """
     Start the interview. Returns the first question.
     """
