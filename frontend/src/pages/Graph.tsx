@@ -43,133 +43,194 @@ function FitViewButton() {
   );
 }
 
-// Simple layout algorithm - arrange nodes in a hierarchical layout (top-down)
+// Improved hierarchical layout algorithm - prevents overlaps and handles complex relationships
 const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
-  // Find root nodes (nodes with no parents)
-  const rootNodes = backendNodes.filter(node => node.parent_nodes.length === 0);
-
   // Create a map for quick lookup
   const nodeMap = new Map(backendNodes.map(node => [node.id, node]));
 
-  // Calculate positions using a top-down hierarchical layout
-  const positions = new Map<number, { x: number; y: number }>();
-  const visited = new Set<number>();
-  const levelNodes = new Map<number, number[]>(); // Track nodes at each level
-
-  // Build a map of all children for each node (including from parent_nodes relationships)
-  const allChildrenMap = new Map<number, number[]>();
+  // Build relationship maps
+  const childrenMap = new Map<number, number[]>();
+  const parentsMap = new Map<number, number[]>();
+  
   backendNodes.forEach((node) => {
+    // Build children map (from child_nodes and parent_nodes relationships)
     const children = new Set(node.child_nodes);
-    // Also add nodes that have this node as parent
     backendNodes.forEach((n) => {
       if (n.parent_nodes.includes(node.id)) {
         children.add(n.id);
       }
     });
-    allChildrenMap.set(node.id, Array.from(children));
+    childrenMap.set(node.id, Array.from(children));
+    
+    // Build parents map
+    parentsMap.set(node.id, node.parent_nodes);
   });
 
-  // Calculate positions for nodes at each level
-  const layoutNode = (nodeId: number, level: number, siblingIndex: number, totalSiblings: number) => {
-    if (visited.has(nodeId)) return;
-    visited.add(nodeId);
-
-    const node = nodeMap.get(nodeId);
-    if (!node) return;
-
-    // Top-down layout: Y increases with depth, X for horizontal spacing
-    const horizontalSpacing = 300;
-    const verticalSpacing = 250;
-
-    // Calculate x position - center siblings horizontally
-    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
-    const totalWidth = Math.max(0, (totalSiblings - 1) * horizontalSpacing);
-    const startX = (screenWidth - totalWidth) / 2;
-    const x = startX + siblingIndex * horizontalSpacing;
-
-    // Calculate y position based on level (vertical growth from top)
-    // Start from top (y=100) and increase downward
-    const y = level * verticalSpacing + 100;
-
-    positions.set(nodeId, { x, y });
-
-    // Track nodes at this level
-    if (!levelNodes.has(level)) {
-      levelNodes.set(level, []);
+  // Calculate level (distance from root) for each node
+  const nodeLevels = new Map<number, number>();
+  const calculateLevel = (nodeId: number): number => {
+    if (nodeLevels.has(nodeId)) {
+      return nodeLevels.get(nodeId)!;
     }
-    levelNodes.get(level)!.push(nodeId);
+    
+    const parents = parentsMap.get(nodeId) || [];
+    if (parents.length === 0) {
+      nodeLevels.set(nodeId, 0);
+      return 0;
+    }
+    
+    // For nodes with multiple parents, use the minimum level + 1
+    const parentLevels = parents.map(p => calculateLevel(p));
+    const level = Math.min(...parentLevels) + 1;
+    nodeLevels.set(nodeId, level);
+    return level;
+  };
 
-    // Get all children (from the map we built)
-    const allChildren = allChildrenMap.get(nodeId) || [];
+  // Calculate levels for all nodes
+  backendNodes.forEach(node => {
+    calculateLevel(node.id);
+  });
 
-    // Layout children
-    allChildren.forEach((childId, childIndex) => {
-      layoutNode(childId, level + 1, childIndex, allChildren.length);
+  // Group nodes by level
+  const nodesByLevel = new Map<number, number[]>();
+  backendNodes.forEach(node => {
+    const level = nodeLevels.get(node.id) || 0;
+    if (!nodesByLevel.has(level)) {
+      nodesByLevel.set(level, []);
+    }
+    nodesByLevel.get(level)!.push(node.id);
+  });
+
+  // Node dimensions (from CustomNode: minWidth 150, minHeight 80)
+  const NODE_WIDTH = 180;
+  const NODE_HEIGHT = 100;
+  const HORIZONTAL_SPACING = 250; // Space between nodes horizontally
+  const VERTICAL_SPACING = 200; // Space between levels vertically
+  const START_Y = 100;
+
+  // Calculate positions for each level
+  const positions = new Map<number, { x: number; y: number }>();
+  
+  // Sort levels
+  const sortedLevels = Array.from(nodesByLevel.keys()).sort((a, b) => a - b);
+  
+  sortedLevels.forEach((level) => {
+    const nodeIds = nodesByLevel.get(level)!;
+    const y = level * VERTICAL_SPACING + START_Y;
+    
+    // Calculate total width needed for this level
+    const totalWidth = (nodeIds.length - 1) * HORIZONTAL_SPACING + NODE_WIDTH;
+    
+    // Center the level horizontally
+    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1400;
+    const startX = (screenWidth - totalWidth) / 2;
+    
+    // Position nodes at this level
+    nodeIds.forEach((nodeId, index) => {
+      const x = startX + index * HORIZONTAL_SPACING;
+      positions.set(nodeId, { x, y });
+    });
+  });
+
+  // For nodes with multiple parents, try to position them between their parents
+  // This helps with edge visualization
+  const adjustPositionsForMultipleParents = () => {
+    backendNodes.forEach(node => {
+      const parents = parentsMap.get(node.id) || [];
+      if (parents.length > 1) {
+        // Get parent positions
+        const parentPositions = parents
+          .map(p => positions.get(p))
+          .filter(p => p !== undefined) as { x: number; y: number }[];
+        
+        if (parentPositions.length > 0) {
+          // Calculate average x position of parents
+          const avgX = parentPositions.reduce((sum, p) => sum + p.x, 0) / parentPositions.length;
+          const level = nodeLevels.get(node.id) || 0;
+          const y = level * VERTICAL_SPACING + START_Y;
+          
+          // Check if this position would overlap with other nodes at this level
+          const nodeIdsAtLevel = nodesByLevel.get(level) || [];
+          const existingPositions = nodeIdsAtLevel
+            .map(id => positions.get(id))
+            .filter(p => p !== undefined) as { x: number; y: number }[];
+          
+          // Find a non-overlapping position near the average
+          let bestX = avgX;
+          let minDistance = Infinity;
+          
+          // Try positions around the average
+          for (let offset = -HORIZONTAL_SPACING; offset <= HORIZONTAL_SPACING; offset += 50) {
+            const testX = avgX + offset;
+            const conflicts = existingPositions.filter(p => 
+              Math.abs(p.x - testX) < HORIZONTAL_SPACING && p.y === y
+            );
+            
+            if (conflicts.length === 0) {
+              bestX = testX;
+              break;
+            } else {
+              const distance = Math.abs(offset);
+              if (distance < minDistance) {
+                minDistance = distance;
+                bestX = testX;
+              }
+            }
+          }
+          
+          positions.set(node.id, { x: bestX, y });
+        }
+      }
     });
   };
 
-  // Layout all root nodes
-  rootNodes.forEach((rootNode, index) => {
-    layoutNode(rootNode.id, 0, index, rootNodes.length);
-  });
+  adjustPositionsForMultipleParents();
 
-  // Handle any remaining unvisited nodes (shouldn't happen, but just in case)
-  backendNodes.forEach((node) => {
-    if (!visited.has(node.id)) {
-      const maxLevel = levelNodes.size > 0 ? Math.max(...Array.from(levelNodes.keys())) : 0;
-      const siblingsAtLevel = Array.from(levelNodes.get(maxLevel + 1) || []).length;
-      positions.set(node.id, {
-        x: 200 + siblingsAtLevel * 300,
-        y: (maxLevel + 1) * 250 + 100,
-      });
-      if (!levelNodes.has(maxLevel + 1)) {
-        levelNodes.set(maxLevel + 1, []);
+  // Final pass: ensure no overlaps by adjusting positions at each level
+  const finalPositions = new Map<number, { x: number; y: number }>();
+  sortedLevels.forEach((level) => {
+    const nodeIds = nodesByLevel.get(level) || [];
+    const sortedNodeIds = [...nodeIds].sort((a, b) => {
+      const posA = positions.get(a) || { x: 0, y: 0 };
+      const posB = positions.get(b) || { x: 0, y: 0 };
+      return posA.x - posB.x;
+    });
+    
+    const levelPositions: { x: number; y: number }[] = [];
+    
+    sortedNodeIds.forEach((nodeId) => {
+      const originalPos = positions.get(nodeId);
+      if (originalPos) {
+        let x = originalPos.x;
+        
+        // Check for overlaps with already positioned nodes at this level
+        for (const existingPos of levelPositions) {
+          if (Math.abs(x - existingPos.x) < HORIZONTAL_SPACING) {
+            x = existingPos.x + HORIZONTAL_SPACING;
+          }
+        }
+        
+        const finalPos = { x, y: originalPos.y };
+        levelPositions.push(finalPos);
+        finalPositions.set(nodeId, finalPos);
       }
-      levelNodes.get(maxLevel + 1)!.push(node.id);
-    }
-  });
-
-  // Center nodes at each level horizontally
-  const centeredPositions = new Map<number, { x: number; y: number }>();
-
-  levelNodes.forEach((nodeIds, level) => {
-    if (nodeIds.length === 0) return;
-
-    // Calculate total width needed for this level
-    const nodePositions = nodeIds.map(id => positions.get(id)!);
-    const minX = Math.min(...nodePositions.map(p => p.x));
-    const maxX = Math.max(...nodePositions.map(p => p.x));
-    const levelWidth = maxX - minX;
-
-    // Center the level
-    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
-    const centerX = screenWidth / 2;
-    const offsetX = centerX - (minX + levelWidth / 2);
-
-    // Apply offset to all nodes at this level
-    nodeIds.forEach((nodeId) => {
-      const originalPos = positions.get(nodeId)!;
-      centeredPositions.set(nodeId, {
-        x: originalPos.x + offsetX,
-        y: originalPos.y,
-      });
     });
   });
 
-  // Use centered positions if available, otherwise use original positions
+  // Use final positions
   return backendNodes.map((backendNode) => {
-    const pos = centeredPositions.get(backendNode.id) || positions.get(backendNode.id) || { x: 200, y: 100 };
+    const pos = finalPositions.get(backendNode.id) || positions.get(backendNode.id) || { x: 200, y: 100 };
     return {
-    id: backendNode.id.toString(),
-    type: 'custom',
+      id: backendNode.id.toString(),
+      type: 'custom',
       position: pos,
-    data: {
-      label: backendNode.name,
-      status: backendNode.status,
-      level: backendNode.level,
-      nodeId: backendNode.id,
-      disabled: backendNode.status === NodeStatus.DISABLED,
-    },
+      data: {
+        label: backendNode.name,
+        status: backendNode.status,
+        level: backendNode.level,
+        nodeId: backendNode.id,
+        disabled: backendNode.status === NodeStatus.DISABLED,
+      },
     };
   });
 };
