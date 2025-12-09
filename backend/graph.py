@@ -15,6 +15,11 @@ class Graph:
     def add_node(self, node: Node) -> None:
         """Add a node to the graph."""
         self.nodes[node.id] = node
+        # Add node as child to its parents
+        for parent_node_id in node.parent_nodes:
+            parent_node: Node = self[parent_node_id]
+            if node.id not in parent_node.child_nodes:
+                parent_node.child_nodes.append(node.id)
 
     def add_edge(self, from_id: int, to_id: int) -> None:
         src: Node = self[from_id]

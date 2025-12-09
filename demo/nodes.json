@@ -3,8 +3,7 @@
     "id": 1,
     "name": "Java",
     "status": "not_reached",
-    "level": "A1",
-    "parent_nodes": []
+    "level": "A1"
   },
   {
     "id": 2,
@@ -32,5 +31,84 @@
     "parent_nodes": [1],
     "question": "What is Java Serialization and why do we use it?",
     "criteria": "User mentions: Serialization is the conversion of object graphs to bytes. Used in distributed systems, persistence, and messaging. Understands limitations and alternatives (JSON )."
+  },
+  {
+    "id": 5,
+    "name": "OOP",
+    "status": "not_reached",
+    "level": "A1",
+    "parent_nodes": [1],
+    "question": "What are the four main principles of Object-Oriented Programming?",
+    "criteria": "User mentions: abstraction, encapsulation, inheritance, polymorphism"
+  },
+  {
+    "id": 6,
+    "name": "Abstraction",
+    "status": "not_reached",
+    "level": "A1",
+    "parent_nodes": [5],
+    "question": "How does Java implement the concept of abstraction?",
+    "criteria": ""
+  },
+  {
+    "id": 7,
+    "name": "Polymorphism",
+    "status": "not_reached",
+    "level": "A1",
+    "parent_nodes": [5],
+    "question": "Can you explain the concept of polymorphism in Java?",
+    "criteria": ""
+  },
+  {
+    "id": 8,
+    "name": "Inheritance",
+    "status": "not_reached",
+    "level": "A1",
+    "parent_nodes": [5],
+    "question": "How does Java implement the concept of inheritance?",
+    "criteria": ""
+  },
+  {
+    "id": 9,
+    "name": "Encapsulation",
+    "status": "not_reached",
+    "level": "A1",
+    "parent_nodes": [5],
+    "question": "What is encapsulation in Java and how is it achieved?",
+    "criteria": ""
+  },
+  {
+    "id": 10,
+    "name": "JVM",
+    "status": "not_reached",
+    "level": "A3",
+    "parent_nodes": [1]
+  },
+  {
+    "id": 11,
+    "name": "Classloading",
+    "status": "not_reached",
+    "level": "A3",
+    "parent_nodes": [10],
+    "question": "When implementing a custom class loader in Java is justified?",
+    "criteria": ""
+  },
+  {
+    "id": 12,
+    "name": "Memory Management",
+    "status": "not_reached",
+    "level": "A3",
+    "parent_nodes": [10],
+    "question": null,
+    "criteria": null
+  },
+  {
+    "id": 13,
+    "name": "Garbage Collection",
+    "status": "not_reached",
+    "level": "A3",
+    "parent_nodes": [12],
+    "question": "What is the role of garbage collection in Java?",
+    "criteria": ""
   }
 ]
