@@ -20,7 +20,7 @@ app.add_middleware(
 )
 
 graph: Graph = Graph()
-
+last_node: Node = None
 
 @app.get("/api/nodes", response_model=List[Node])
 def list_nodes() -> List[Node]:
@@ -127,9 +127,19 @@ def chat_start():
     """
     Start the interview. Returns the first question.
     """
-    return {
-        "question": "stub message: the first question"
-    }
+    global last_node
+    graph.reset()
+    last_node = graph.next()
+    if last_node is not None:
+        return {
+            "question": last_node.question, # Graph returns nodes with non-None questions only
+            "completed": False
+        }
+    else:
+        return {
+            "question": "No questions found.",
+            "completed": True,
+        }
 
 
 @app.post("/api/chat/answer")
@@ -137,9 +147,19 @@ def chat_answer(answer: str):
     """
     Receive user's answer and return next question.
     """
-    return {
-        "question": "stub message: next question"
-    }
+    global last_node
+    graph.mark_passed(last_node.id)
+    last_node = graph.next()
+    if last_node is not None:
+        return {
+            "question": last_node.question,
+            "completed": False,
+        }
+    else:
+        return {
+            "question": "No more questions found.",
+            "completed": True
+        }
 
 
 @app.post("/api/chat/stop")
