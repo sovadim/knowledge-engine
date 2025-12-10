@@ -1,4 +1,4 @@
-from dto import Node, NodeStatus
+from dto import Node, NodeStatus, NodeLevel
 from typing import Dict, List, Optional
 
 
@@ -6,6 +6,7 @@ class Graph:
     def __init__(self):
         self._nodes: Dict[int, Node] = {}
         self._stack: Optional[List[Node]] = []
+        self._traversal_level: NodeLevel = None
 
     def __contains__(self, node_id: int) -> bool:
         return node_id in self._nodes
@@ -73,7 +74,7 @@ class Graph:
 
         # Put child on stack
         node: Node = self._stack[-1]
-        for child_id in node.child_nodes:
+        for child_id in self._filtered(node.child_nodes):
             child_node: Node = self[child_id]
             if child_node.status == NodeStatus.NOT_REACHED:
                 child_node.status = NodeStatus.IN_PROGRESS
@@ -98,6 +99,26 @@ class Graph:
                 node.status = NodeStatus.PASSED
                 return self.next()
 
+    def _filtered(self, node_ids: List[int]) -> List[int]:
+        """Filter child nodes based on enabled status and traversal level."""
+        filtered: List[int] = []
+
+        for id in node_ids:
+            node: Node = self[id]
+            if self._fits(node):
+                filtered.append(id)
+
+        return filtered
+
+    def _fits(self, node: Node) -> bool:
+        if node.status == NodeStatus.DISABLED:
+            return False
+    
+        if self._traversal_level is None:
+            return True
+
+        return node.level.value <= self._traversal_level.value
+
     def mark_passed(self, id: int) -> None:
         node: Node = self[id]
         node.status = NodeStatus.PASSED
@@ -109,10 +130,11 @@ class Graph:
     def _get_root(self) -> Node:
         return self.get_node(1) # Assuming root node has id 1
 
-    def reset(self) -> None:
+    def reset(self, traversal_level: NodeLevel) -> None:
         """Reset the traverstal state of the graph."""
         # Mark nodes as not reached
         for node in self._nodes.values():
             node.status = NodeStatus.NOT_REACHED
         # Reset stack
         self._stack = None
+        self._traversal_level = traversal_level
