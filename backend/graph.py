@@ -119,13 +119,12 @@ class Graph:
 
         return node.level.value <= self._traversal_level.value
 
-    def mark_passed(self, id: int) -> None:
-        node: Node = self[id]
-        node.status = NodeStatus.PASSED
-
-    def mark_failed(self, id: int) -> None:
-        node: Node = self[id]
-        node.status = NodeStatus.FAILED
+    def eval(self, node: Node, score: int) -> None:
+        node.score = score
+        if node.score == 0:
+            node.status = NodeStatus.FAILED
+        else:
+            node.status = NodeStatus.PASSED
 
     def _get_root(self) -> Node:
         return self.get_node(1) # Assuming root node has id 1
@@ -135,6 +134,7 @@ class Graph:
         # Mark nodes as not reached
         for node in self._nodes.values():
             node.status = NodeStatus.NOT_REACHED
+            node.score = 0
         # Reset stack
         self._stack = None
         self._traversal_level = traversal_level
