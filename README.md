@@ -9,9 +9,10 @@
 
 ```
 knowledge-engine
-|__frontend - ReactJS frontend
-|__backend  - FastAPI backend
-|__demo     - Demo data and script
+|__frontend  - ReactJS frontend
+|__backend   - FastAPI backend
+|__demo      - Demo data and script
+|__notebooks - Jupyter notebooks with tests
 ```
 
 ## How to Run
