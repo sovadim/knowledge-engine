@@ -2,7 +2,8 @@
 
 ## Dependencies
 
-* [uv](https://docs.astral.sh/uv/#installation) (alternative python package manager)
+* frontend: [nodejs](https://nodejs.org/en/download)
+* backend: [uv](https://docs.astral.sh/uv/#installation) (alternative python package manager)
 
 ## Project structure
 
