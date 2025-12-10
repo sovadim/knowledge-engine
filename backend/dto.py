@@ -24,6 +24,7 @@ class Node(BaseModel):
 
     status: NodeStatus
     level: NodeLevel
+    score: int = 0
 
     child_nodes: List[int] = []
     parent_nodes: List[int] = []
