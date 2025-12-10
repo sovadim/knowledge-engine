@@ -30,3 +30,9 @@ class Node(BaseModel):
 
     question: Optional[str] = None
     criteria: Optional[str] = None
+
+
+class NodeEditPayload(BaseModel):
+    level: Optional[NodeLevel] = None
+    question: Optional[str] = None
+    criteria: Optional[str] = None
