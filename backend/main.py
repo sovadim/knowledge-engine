@@ -128,7 +128,7 @@ def chat_start(level: NodeLevel = Query(..., description="Interview level: A1, A
     Start the interview. Returns the first question.
     """
     global last_node
-    graph.reset()
+    graph.reset(level)
     last_node = graph.next()
     if last_node is not None:
         return {
