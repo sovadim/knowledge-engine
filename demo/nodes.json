@@ -110,5 +110,33 @@
     "parent_nodes": [12],
     "question": "What is the role of garbage collection in Java?",
     "criteria": ""
+  },
+  {
+    "id": 14,
+    "name": "Concurrency",
+    "status": "disabled",
+    "level": "A3",
+    "parent_nodes": [1]
+  },
+  {
+    "id": 15,
+    "name": "Threads",
+    "status": "disabled",
+    "level": "A3",
+    "parent_nodes": [14]
+  },
+  {
+    "id": 16,
+    "name": "Synchronization",
+    "status": "disabled",
+    "level": "A3",
+    "parent_nodes": [14]
+  },
+  {
+    "id": 17,
+    "name": "Concurrent Collections",
+    "status": "disabled",
+    "level": "A3",
+    "parent_nodes": [1]
   }
 ]

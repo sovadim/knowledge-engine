@@ -5,13 +5,18 @@
 * frontend: [nodejs](https://nodejs.org/en/download)
 * backend: [uv](https://docs.astral.sh/uv/#installation) (alternative python package manager)
 
+You need to export the following env variables to use AI:
+* `$ export AZURE_ENDPOINT=<your endpoint>`
+* `$ export DIAL_API_KEY=<your api key>`
+
 ## Project structure
 
 ```
 knowledge-engine
-|__frontend - ReactJS frontend
-|__backend  - FastAPI backend
-|__demo     - Demo data and script
+|__frontend  - ReactJS frontend
+|__backend   - FastAPI backend
+|__demo      - Demo data and script
+|__notebooks - Jupyter notebooks with tests
 ```
 
 ## How to Run

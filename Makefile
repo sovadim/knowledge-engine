@@ -35,3 +35,4 @@ stop:
 check:
 	cd backend && uv run ruff check
 	cd demo && uv run ruff check
+	cd notebooks && uv run ruff check
