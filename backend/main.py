@@ -5,8 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from dto import Node, NodeStatus, NodeLevel, NodeEditPayload
 from graph import Graph
+from eval_ai import JudgeAI
 
 app = FastAPI()
+judge = JudgeAI()
 
 # Add CORS middleware to allow frontend requests
 # Must be added before routes are defined
@@ -173,7 +175,8 @@ def chat_answer(answer: str):
     Receive user's answer and return next question.
     """
     global last_node
-    graph.mark_passed(last_node.id)
+    score: int = judge.eval(question=last_node.question, answer=answer)
+    graph.eval(last_node, score)
     last_node = graph.next()
     if last_node is not None:
         return {
