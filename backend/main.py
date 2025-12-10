@@ -3,7 +3,7 @@ from typing import List
 from fastapi import FastAPI, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from dto import Node, NodeStatus, NodeLevel
+from dto import Node, NodeStatus, NodeLevel, NodeEditPayload
 from graph import Graph
 
 app = FastAPI()
@@ -52,6 +52,31 @@ def create_node(payload: Node) -> Node:
 def delete_node(node_id: int) -> None:
     """Delete a node by id."""
     graph.delete(node_id)
+
+
+@app.patch("/api/nodes/{node_id}", response_model=Node)
+def edit_node(node_id: int, payload: NodeEditPayload):
+    """
+    Edit an existing node's level, question, and criteria.
+    All fields are optional; only provided fields are updated.
+    """
+    node = graph[node_id]
+    if not node:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Node {node_id} not found",
+        )
+
+    if payload.level is not None:
+        node.level = payload.level
+
+    if payload.question is not None:
+        node.question = payload.question
+
+    if payload.criteria is not None:
+        node.criteria = payload.criteria
+
+    return node
 
 
 @app.post("/api/edge", status_code=status.HTTP_201_CREATED)
