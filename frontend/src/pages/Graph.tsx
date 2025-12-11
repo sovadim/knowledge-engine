@@ -423,26 +423,17 @@ function Graph() {
 
     try {
       // Use PATCH endpoint to update only the fields that are provided
-      const payload: { level?: string; question?: string; criteria_a1?: string; criteria_a2?: string; criteria_a3?: string } = {};
+      const payload: { level?: string; question?: string; criteria?: string } = {};
       if (newNodeData.level) {
         payload.level = newNodeData.level;
       }
       if (newNodeData.question !== undefined) {
         payload.question = newNodeData.question.trim() || undefined;
       }
-      if (newNodeData.criteria_a1 !== undefined) {
-        payload.criteria_a1 = newNodeData.criteria_a1.trim() || undefined;
+      if (newNodeData.criteria !== undefined) {
+        payload.criteria = newNodeData.criteria.trim() || undefined;
       }
-      const updatedNode: BackendNode = {
-        ...existingNode,
-        name: newNodeData.name,
-        level: newNodeData.level,
-        question: newNodeData.question.trim() || undefined,
-        criteria: newNodeData.criteria.trim() || undefined,
-      };
 
-      // Use createNode API which also works for updates (backend overwrites by id)
-      await api.createNode(updatedNode);
       await api.editNode(editingNodeId, payload);
       setShowEditNodeDialog(false);
       setEditingNodeId(null);
@@ -573,6 +564,16 @@ function Graph() {
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Don't trigger node deletion if user is typing in an input field or textarea
+      const activeElement = document.activeElement;
+      if (activeElement && (
+        activeElement.tagName === 'INPUT' ||
+        activeElement.tagName === 'TEXTAREA' ||
+        activeElement.isContentEditable
+      )) {
+        return;
+      }
+
       if (event.key === 'Delete' || event.key === 'Backspace') {
         const selectedNodes = nodes.filter(n => n.selected);
         const selectedEdges = edges.filter(e => e.selected);
