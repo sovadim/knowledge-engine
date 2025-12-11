@@ -257,5 +257,59 @@ export const api = {
       throw error;
     }
   },
+
+  // Config
+  saveApiKey: async (key: string): Promise<void> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/config/api-key`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ key }),
+      });
+      
+      if (!response.ok) {
+        let errorText = '';
+        try {
+          errorText = await response.text();
+        } catch (e) {
+          // If we can't read the response, use status text
+          errorText = response.statusText || `HTTP ${response.status}`;
+        }
+        
+        console.error('API Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorText,
+        });
+        
+        let errorMessage = `Failed to save API key (${response.status})`;
+        if (errorText) {
+          try {
+            const errorJson = JSON.parse(errorText);
+            if (errorJson.detail) {
+              errorMessage = errorJson.detail;
+            } else if (errorJson.message) {
+              errorMessage = errorJson.message;
+            }
+          } catch {
+            // If it's not JSON, use the text as is
+            if (errorText.trim()) {
+              errorMessage = errorText;
+            }
+          }
+        }
+        throw new Error(errorMessage);
+      }
+      // 204 No Content - response has no body, just return
+      // Don't try to parse JSON for 204 responses
+    } catch (error) {
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Network error: Could not connect to the server. Please make sure the backend is running on http://localhost:8000');
+      }
+      throw error;
+    }
+  },
 };
 

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import GraphPage from './pages/Graph';
 import ChatPage from './pages/Chat';
+import SettingsPage from './pages/Settings';
 import './App.css';
 
 function App() {
@@ -49,12 +50,28 @@ function App() {
         >
           Chat
         </Link>
+        <Link
+          to="/settings"
+          style={{
+            textDecoration: 'none',
+            color: '#333',
+            fontWeight: '500',
+            padding: '0.5rem 1rem',
+            borderRadius: '6px',
+            transition: 'background-color 0.2s',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+        >
+          Settings
+        </Link>
       </nav>
       <div style={{ marginTop: '60px' }}>
         <Routes>
           <Route path="/" element={<Navigate to="/graph" replace />} />
           <Route path="/graph" element={<GraphPage />} />
           <Route path="/chat" element={<ChatPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </div>
     </BrowserRouter>
