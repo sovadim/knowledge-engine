@@ -37,3 +37,7 @@ class NodeEditPayload(BaseModel):
     level: Optional[NodeLevel] = None
     question: Optional[str] = None
     criteria: Optional[str] = None
+
+
+class ApiKeyRequest(BaseModel):
+    key: str

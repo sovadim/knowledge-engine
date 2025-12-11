@@ -3,7 +3,7 @@ from typing import List
 from fastapi import FastAPI, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from dto import Node, NodeStatus, NodeLevel, NodeEditPayload
+from dto import Node, NodeStatus, NodeLevel, NodeEditPayload, ApiKeyRequest
 from graph import Graph
 from eval_ai import JudgeAI
 
@@ -198,6 +198,16 @@ def chat_stop():
     return {
         "message": "stub message: interview stopped"
     }
+
+
+@app.post("/api/config/api-key", status_code=status.HTTP_204_NO_CONTENT)
+def set_api_key(request: ApiKeyRequest):
+    """
+    Set the API key.
+    """
+    judge.set_api_key(request.key)
+
+    return None
 
 
 @app.get("/ping")
