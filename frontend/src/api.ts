@@ -74,7 +74,7 @@ export const api = {
     }
   },
 
-  editNode: async (nodeId: number, payload: { level?: string; question?: string; criteria?: string }): Promise<Node> => {
+  editNode: async (nodeId: number, payload: { level?: string; question?: string; criteria_a1?: string; criteria_a2?: string; criteria_a3?: string }): Promise<Node> => {
     const response = await fetch(`${API_BASE_URL}/api/nodes/${nodeId}`, {
       method: 'PATCH',
       headers: {

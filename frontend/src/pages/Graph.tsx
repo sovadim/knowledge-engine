@@ -423,18 +423,16 @@ function Graph() {
 
     try {
       // Use PATCH endpoint to update only the fields that are provided
-      const payload: { level?: string; question?: string; criteria?: string } = {};
+      const payload: { level?: string; question?: string; criteria_a1?: string; criteria_a2?: string; criteria_a3?: string } = {};
       if (newNodeData.level) {
         payload.level = newNodeData.level;
       }
       if (newNodeData.question !== undefined) {
         payload.question = newNodeData.question.trim() || undefined;
       }
-      if (newNodeData.criteria !== undefined) {
-        payload.criteria = newNodeData.criteria.trim() || undefined;
+      if (newNodeData.criteria_a1 !== undefined) {
+        payload.criteria_a1 = newNodeData.criteria_a1.trim() || undefined;
       }
-
-<<<<<<< Updated upstream
       const updatedNode: BackendNode = {
         ...existingNode,
         name: newNodeData.name,
@@ -445,9 +443,7 @@ function Graph() {
 
       // Use createNode API which also works for updates (backend overwrites by id)
       await api.createNode(updatedNode);
-=======
       await api.editNode(editingNodeId, payload);
->>>>>>> Stashed changes
       setShowEditNodeDialog(false);
       setEditingNodeId(null);
       setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria: '' });
