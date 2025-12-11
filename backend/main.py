@@ -33,7 +33,7 @@ def list_nodes() -> List[Node]:
 @app.get("/api/nodes/{node_id}", response_model=Node)
 def get_node(node_id: int) -> Node:
     """Return a single node by id."""
-    node = graph.get(node_id)
+    node = graph[node_id]
     if not node:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

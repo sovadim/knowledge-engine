@@ -71,7 +71,10 @@ function Chat() {
 
   const handleRestart = async () => {
     setSessionId(null);
-    await handleStart();
+    setIsInterviewActive(false);
+    setMessages([]);
+    // Keep the selected level, but allow user to change it
+    // The level selector will be shown again since isInterviewActive is false and messages.length is 0
   };
 
   const handleStop = async () => {
@@ -205,6 +208,14 @@ function Chat() {
           )}
           {isInterviewActive && (
             <>
+              <div style={{ 
+                display: 'flex', 
+                gap: '10px', 
+                alignItems: 'center',
+                marginRight: '10px'
+              }}>
+                <span style={{ fontWeight: '500', color: '#374151' }}>Level: {selectedLevel}</span>
+              </div>
               <button
                 onClick={handleRestart}
                 disabled={isLoading}
@@ -224,14 +235,49 @@ function Chat() {
             </>
           )}
           {!isInterviewActive && messages.length > 0 && (
-            <button
-              onClick={handleRestart}
-              disabled={isLoading}
-              className="btn btn-primary"
-              title="Restart Interview"
-            >
-              Restart Interview
-            </button>
+            <>
+              <div style={{ 
+                display: 'flex', 
+                gap: '10px', 
+                alignItems: 'center',
+                marginRight: '10px'
+              }}>
+                <span style={{ fontWeight: '500', color: '#374151' }}>Select Level:</span>
+                {[NodeLevel.A1, NodeLevel.A2, NodeLevel.A3].map((level) => (
+                  <button
+                    key={level}
+                    onClick={() => setSelectedLevel(level)}
+                    disabled={isLoading}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: selectedLevel === level ? '#3b82f6' : '#e5e7eb',
+                      color: selectedLevel === level ? 'white' : '#374151',
+                      border: `2px solid ${selectedLevel === level ? '#3b82f6' : '#d1d5db'}`,
+                      borderRadius: '6px',
+                      cursor: isLoading ? 'not-allowed' : 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      transition: 'all 0.2s',
+                    }}
+                    title={`Select ${level} level`}
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={handleRestart}
+                disabled={isLoading || !selectedLevel}
+                className="btn btn-primary"
+                title="Restart Interview"
+                style={{
+                  opacity: !selectedLevel ? 0.5 : 1,
+                  cursor: !selectedLevel ? 'not-allowed' : 'pointer',
+                }}
+              >
+                Restart Interview
+              </button>
+            </>
           )}
         </div>
       </div>

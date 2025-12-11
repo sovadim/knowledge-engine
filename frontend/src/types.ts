@@ -17,6 +17,7 @@ export interface Node {
   name: string;
   status: NodeStatus;
   level: NodeLevel;
+  score: number;
   child_nodes: number[];
   parent_nodes: number[];
   question?: string;

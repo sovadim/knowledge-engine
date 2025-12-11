@@ -74,6 +74,21 @@ export const api = {
     }
   },
 
+  editNode: async (nodeId: number, payload: { level?: string; question?: string; criteria?: string }): Promise<Node> => {
+    const response = await fetch(`${API_BASE_URL}/api/nodes/${nodeId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to edit node ${nodeId}: ${errorText}`);
+    }
+    return response.json();
+  },
+
   resetAllNodes: async (): Promise<void> => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/nodes/reset`, {

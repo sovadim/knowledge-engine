@@ -45,9 +45,6 @@ function FitViewButton() {
 
 // Improved hierarchical layout algorithm - prevents overlaps and handles complex relationships
 const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
-  // Create a map for quick lookup
-  const nodeMap = new Map(backendNodes.map(node => [node.id, node]));
-
   // Build relationship maps
   const childrenMap = new Map<number, number[]>();
   const parentsMap = new Map<number, number[]>();
@@ -101,11 +98,12 @@ const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
     nodesByLevel.get(level)!.push(node.id);
   });
 
-  // Node dimensions (from CustomNode: minWidth 150, minHeight 80)
-  const NODE_WIDTH = 180;
-  const NODE_HEIGHT = 100;
-  const HORIZONTAL_SPACING = 250; // Space between nodes horizontally
-  const VERTICAL_SPACING = 200; // Space between levels vertically
+  // Node dimensions (from CustomNode: minWidth 150, minHeight 80, but can be taller with questions)
+  // Nodes can expand to fit question text, so we need generous spacing
+  const NODE_WIDTH = 200; // Increased to account for question text width
+  const NODE_HEIGHT = 140; // Account for nodes with questions (name + question text)
+  const HORIZONTAL_SPACING = 450; // Significantly increased space between nodes horizontally
+  const VERTICAL_SPACING = 350; // Significantly increased space between levels vertically
   const START_Y = 100;
 
   // Calculate positions for each level
@@ -159,8 +157,9 @@ const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
           let bestX = avgX;
           let minDistance = Infinity;
           
-          // Try positions around the average
-          for (let offset = -HORIZONTAL_SPACING; offset <= HORIZONTAL_SPACING; offset += 50) {
+          // Try positions around the average with proper spacing
+          // Use HORIZONTAL_SPACING as minimum gap to prevent overlaps
+          for (let offset = -HORIZONTAL_SPACING * 2; offset <= HORIZONTAL_SPACING * 2; offset += 50) {
             const testX = avgX + offset;
             const conflicts = existingPositions.filter(p => 
               Math.abs(p.x - testX) < HORIZONTAL_SPACING && p.y === y
@@ -204,8 +203,15 @@ const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
         let x = originalPos.x;
         
         // Check for overlaps with already positioned nodes at this level
+        // Ensure minimum gap to prevent overlaps, especially with question text
+        // Use HORIZONTAL_SPACING to ensure consistent spacing
         for (const existingPos of levelPositions) {
-          if (Math.abs(x - existingPos.x) < HORIZONTAL_SPACING) {
+          const distance = x - existingPos.x;
+          if (distance >= 0 && distance < HORIZONTAL_SPACING) {
+            // Node is too close to the right, move it further
+            x = existingPos.x + HORIZONTAL_SPACING;
+          } else if (distance < 0 && Math.abs(distance) < HORIZONTAL_SPACING) {
+            // Node is too close to the left, move it to the right
             x = existingPos.x + HORIZONTAL_SPACING;
           }
         }
@@ -230,6 +236,8 @@ const convertToReactFlowNodes = (backendNodes: BackendNode[]): Node[] => {
         level: backendNode.level,
         nodeId: backendNode.id,
         disabled: backendNode.status === NodeStatus.DISABLED,
+        score: backendNode.score,
+        question: backendNode.question,
       },
     };
   });
@@ -390,6 +398,7 @@ function Graph() {
         name: newNodeData.name,
         status: NodeStatus.NOT_REACHED,
         level: newNodeData.level,
+        score: 0,
         child_nodes: [],
         parent_nodes: [],
         question: newNodeData.question.trim() || undefined,
@@ -408,25 +417,24 @@ function Graph() {
 
   // Handle node editing
   const handleEditNode = useCallback(async () => {
-    if (!editingNodeId || !newNodeData.name.trim()) {
-      alert('Please enter a node name');
+    if (!editingNodeId) {
       return;
     }
 
     try {
-      // Get the existing node to preserve relationships
-      const existingNode = await api.getNode(editingNodeId);
+      // Use PATCH endpoint to update only the fields that are provided
+      const payload: { level?: string; question?: string; criteria?: string } = {};
+      if (newNodeData.level) {
+        payload.level = newNodeData.level;
+      }
+      if (newNodeData.question !== undefined) {
+        payload.question = newNodeData.question.trim() || undefined;
+      }
+      if (newNodeData.criteria !== undefined) {
+        payload.criteria = newNodeData.criteria.trim() || undefined;
+      }
 
-      const updatedNode: BackendNode = {
-        ...existingNode,
-        name: newNodeData.name,
-        level: newNodeData.level,
-        question: newNodeData.question.trim() || undefined,
-        criteria: newNodeData.criteria.trim() || undefined,
-      };
-
-      // Use createNode API which also works for updates (backend overwrites by id)
-      await api.createNode(updatedNode);
+      await api.editNode(editingNodeId, payload);
       setShowEditNodeDialog(false);
       setEditingNodeId(null);
       setNewNodeData({ name: '', level: NodeLevel.A1, question: '', criteria: '' });
@@ -455,6 +463,15 @@ function Graph() {
       alert('Failed to load node data');
     }
   }, []);
+
+  // Handle node double-click
+  const onNodeDoubleClick = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      const nodeId = parseInt(node.id);
+      handleOpenEditDialog(nodeId);
+    },
+    [handleOpenEditDialog]
+  );
 
   // Handle node deletion
   const handleDeleteNode = useCallback(async (nodeId: number) => {
@@ -547,6 +564,16 @@ function Graph() {
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Don't trigger node deletion if user is typing in an input field or textarea
+      const activeElement = document.activeElement;
+      if (activeElement && (
+        activeElement.tagName === 'INPUT' ||
+        activeElement.tagName === 'TEXTAREA' ||
+        activeElement.isContentEditable
+      )) {
+        return;
+      }
+
       if (event.key === 'Delete' || event.key === 'Backspace') {
         const selectedNodes = nodes.filter(n => n.selected);
         const selectedEdges = edges.filter(e => e.selected);
@@ -642,6 +669,7 @@ function Graph() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeContextMenu={onNodeContextMenu}
+        onNodeDoubleClick={onNodeDoubleClick}
         onEdgeContextMenu={onEdgeContextMenu}
         onPaneClick={onPaneClick}
         nodeTypes={nodeTypes}
@@ -894,25 +922,6 @@ function Graph() {
           <h3 style={{ marginTop: 0, color: '#1f2937'}}>Edit Node</h3>
           <div style={{ marginBottom: '15px' }}>
             <label style={{ display: 'block', marginBottom: '5px' }}>
-              Node Name:
-            </label>
-            <input
-              type="text"
-              value={newNodeData.name}
-              onChange={(e) =>
-                setNewNodeData({ ...newNodeData, name: e.target.value })
-              }
-              style={{
-                width: '100%',
-                padding: '8px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-              }}
-              placeholder="Enter node name"
-            />
-          </div>
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px' }}>
               Level:
             </label>
             <select
@@ -937,7 +946,7 @@ function Graph() {
           </div>
           <div style={{ marginBottom: '15px' }}>
             <label style={{ display: 'block', marginBottom: '5px' }}>
-              Question (optional):
+              Question:
             </label>
             <textarea
               value={newNodeData.question}
@@ -957,7 +966,7 @@ function Graph() {
           </div>
           <div style={{ marginBottom: '15px' }}>
             <label style={{ display: 'block', marginBottom: '5px' }}>
-              Criteria A1 (optional):
+              Criteria:
             </label>
             <textarea
               value={newNodeData.criteria}
