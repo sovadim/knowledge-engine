@@ -1,6 +1,7 @@
 import type { Node } from './types';
 
-const API_BASE_URL = 'http://localhost:8000';
+export const API_BASE_URL =
+  import.meta.env.BACKEND_URL ?? "http://localhost:8000";
 
 export const api = {
   // Nodes

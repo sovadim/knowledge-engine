@@ -13,7 +13,7 @@ frontend-init:
 
 frontend: frontend-init
 	@echo "Starting frontend..."
-	@cd frontend && npm run dev &
+	@cd frontend && nohup npm run dev -- --host > frontend.log 2>&1 &
 	@echo "Frontend started http://localhost:5173"
 
 backend-init:
@@ -21,7 +21,7 @@ backend-init:
 
 backend:
 	@echo "Starting backend..."
-	@cd backend && uv run uvicorn main:app --reload &
+	@cd backend && uv run uvicorn main:app --reload > backend.log 2>&1 &
 	@echo "Backend started on http://localhost:8000"
 
 start: backend frontend

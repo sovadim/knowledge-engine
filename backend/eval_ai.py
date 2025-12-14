@@ -66,7 +66,7 @@ class QueryAI:
             print("Please export AZURE_ENDPOINT environment variable.")
 
         if not api_key:
-            print("Please export DIAL_API_KEY environment variable.")
+            api_key=""
 
         self.temperature = temperature
         self.client = AzureOpenAI(
