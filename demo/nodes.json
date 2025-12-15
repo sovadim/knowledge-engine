@@ -2,17 +2,49 @@
   {
     "id": 1,
     "name": "Java",
-    "status": "not_reached",
     "level": "A1"
+  },
+  {
+    "id": 18,
+    "name": "Classes",
+    "level": "A1",
+    "parent_nodes": [1]
+  },
+  {
+    "id": 19,
+    "name": "Class and object",
+    "level": "A1",
+    "parent_nodes": [18],
+    "question": "What is the difference between a class and an object?"
+  },
+  {
+    "id": 20,
+    "name": "Access modifiers",
+    "level": "A1",
+    "parent_nodes": [18],
+    "question": "What are public, private, and protected used for?"
+  },
+  {
+    "id": 21,
+    "name": "Constructor",
+    "level": "A1",
+    "parent_nodes": [18],
+    "question": "What is a constructor and when is it called?"
   },
   {
     "id": 2,
     "name": "Nested class",
-    "status": "not_reached",
     "level": "A1",
-    "parent_nodes": [1],
+    "parent_nodes": [18],
     "question": "What is the difference between a static nested class and a non-static inner class?",
     "criteria": "User mentioned: Static nested classes behave like regular static members and reduce memory footprint. Inner classes hold an implicit reference to the outer instance, which impacts design and potential memory leaks."
+  },
+  {
+    "id": 22,
+    "name": "Composition vs Inheritance",
+    "level": "A2",
+    "parent_nodes": [19, 8],
+    "question": "What is the difference between composition and inheritance?"
   },
   {
     "id": 3,
@@ -35,7 +67,6 @@
   {
     "id": 5,
     "name": "OOP",
-    "status": "not_reached",
     "level": "A1",
     "parent_nodes": [1],
     "question": "What are the four main principles of Object-Oriented Programming?",
@@ -44,7 +75,6 @@
   {
     "id": 6,
     "name": "Abstraction",
-    "status": "not_reached",
     "level": "A1",
     "parent_nodes": [5],
     "question": "How does Java implement the concept of abstraction?",
@@ -53,7 +83,6 @@
   {
     "id": 7,
     "name": "Polymorphism",
-    "status": "not_reached",
     "level": "A1",
     "parent_nodes": [5],
     "question": "Can you explain the concept of polymorphism in Java?",
@@ -62,7 +91,6 @@
   {
     "id": 8,
     "name": "Inheritance",
-    "status": "not_reached",
     "level": "A1",
     "parent_nodes": [5],
     "question": "How does Java implement the concept of inheritance?",
@@ -71,7 +99,6 @@
   {
     "id": 9,
     "name": "Encapsulation",
-    "status": "not_reached",
     "level": "A1",
     "parent_nodes": [5],
     "question": "What is encapsulation in Java and how is it achieved?",
@@ -80,14 +107,12 @@
   {
     "id": 10,
     "name": "JVM",
-    "status": "not_reached",
     "level": "A3",
     "parent_nodes": [1]
   },
   {
     "id": 11,
     "name": "Classloading",
-    "status": "not_reached",
     "level": "A3",
     "parent_nodes": [10],
     "question": "When implementing a custom class loader in Java is justified?",
@@ -96,7 +121,6 @@
   {
     "id": 12,
     "name": "Memory Management",
-    "status": "not_reached",
     "level": "A3",
     "parent_nodes": [10],
     "question": null,
@@ -105,7 +129,6 @@
   {
     "id": 13,
     "name": "Garbage Collection",
-    "status": "not_reached",
     "level": "A3",
     "parent_nodes": [12],
     "question": "What is the role of garbage collection in Java?",

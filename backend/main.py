@@ -195,8 +195,11 @@ def chat_stop():
     """
     Stop the interview.
     """
+    answers: str = graph.get_answers()
+    print("ANSWERS: ", answers)
+    summary: str = judge.summarize(answers)
     return {
-        "message": "stub message: interview stopped"
+        "message": summary
     }
 
 

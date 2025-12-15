@@ -22,7 +22,7 @@ class Node(BaseModel):
     id: int
     name: str
 
-    status: NodeStatus
+    status: Optional[NodeStatus] = NodeStatus.NOT_REACHED
     level: NodeLevel
     score: int = 0
 

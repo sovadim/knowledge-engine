@@ -7,6 +7,7 @@ class Graph:
         self._nodes: Dict[int, Node] = {}
         self._stack: Optional[List[Node]] = []
         self._traversal_level: NodeLevel = None
+        self._answers_history: List[str] = []
 
     def __contains__(self, node_id: int) -> bool:
         return node_id in self._nodes
@@ -20,7 +21,7 @@ class Graph:
         # Add node as child to its parents
         for parent_node_id in node.parent_nodes:
             parent_node: Node = self[parent_node_id]
-            if node.id not in parent_node.child_nodes:
+            if parent_node is not None and node.id not in parent_node.child_nodes:
                 parent_node.child_nodes.append(node.id)
 
     def add_edge(self, from_id: int, to_id: int) -> None:
@@ -89,7 +90,7 @@ class Graph:
             else:
                 return self.next()
         else:
-            node = self._stack.pop()
+            node = self._pop()
             if node.question is not None:
                 # If node was passed before
                 if node.status != NodeStatus.IN_PROGRESS:
@@ -118,6 +119,21 @@ class Graph:
             return True
 
         return node.level.value <= self._traversal_level.value
+    
+    def _pop(self) -> Node:
+        node = self._stack.pop()
+        if node.question is None:
+            # Append as sub-topic
+            self._answers_history.append(node.name + ":")
+        else:
+            # Append as specific skill
+            self._answers_history.append(
+                "- Skill: " + node.name +
+                "; Question: " + node.question +
+                "; Score: " + str(node.score)
+            )
+
+        return node
 
     def eval(self, node: Node, score: int) -> None:
         node.score = score
@@ -125,6 +141,9 @@ class Graph:
             node.status = NodeStatus.FAILED
         else:
             node.status = NodeStatus.PASSED
+
+    def get_answers(self) -> str:
+        return "\n".join(self._answers_history)
 
     def _get_root(self) -> Node:
         return self.get_node(1) # Assuming root node has id 1
@@ -138,3 +157,4 @@ class Graph:
         # Reset stack
         self._stack = None
         self._traversal_level = traversal_level
+        self._answers_history = []
