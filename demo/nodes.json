@@ -70,7 +70,7 @@
     "level": "A1",
     "parent_nodes": [1],
     "question": "What are the four main principles of Object-Oriented Programming?",
-    "criteria": "User mentions: abstraction, encapsulation, inheritance, polymorphism"
+    "criteria": "Candidate mentions: abstraction, encapsulation, inheritance, polymorphism"
   },
   {
     "id": 6,
@@ -137,29 +137,67 @@
   {
     "id": 14,
     "name": "Concurrency",
-    "status": "disabled",
     "level": "A3",
     "parent_nodes": [1]
   },
   {
     "id": 15,
     "name": "Threads",
-    "status": "disabled",
     "level": "A3",
     "parent_nodes": [14]
   },
   {
     "id": 16,
     "name": "Synchronization",
-    "status": "disabled",
     "level": "A3",
     "parent_nodes": [14]
   },
   {
     "id": 17,
     "name": "Concurrent Collections",
-    "status": "disabled",
     "level": "A3",
-    "parent_nodes": [1]
+    "parent_nodes": [14]
+  },
+  {
+    "id": 23,
+    "name": "SOLID Principles",
+    "level": "A1",
+    "parent_nodes": [1],
+    "question": "What SOLID principles do you know?"
+  },
+  {
+    "id": 24,
+    "name": "Single Responsibility Principle",
+    "level": "A1",
+    "parent_nodes": [23],
+    "question": "What does the Single Responsibility Principle mean?"
+  },
+  {
+    "id": 25,
+    "name": "Open/Closed Principle",
+    "level": "A1",
+    "parent_nodes": [23],
+    "question": "What does the Open/Closed Principle mean?"
+  },
+  {
+    "id": 26,
+    "name": "Liskov Substitution Principle",
+    "level": "A1",
+    "parent_nodes": [23],
+    "question": "What does Liskov Substitution Principle say about subclasses?"
+  },
+  {
+    "id": 27,
+    "name": "Interface Segregation Principle",
+    "level": "A1",
+    "parent_nodes": [23],
+    "question": "What problem does the Interface Segregation Principle try to solve?"
+  },
+  {
+    "id": 28,
+    "name": "Dependency Inversion Principle",
+    "level": "A1",
+    "parent_nodes": [23],
+    "question": "What does Dependency Inversion Principle say about dependencies?"
   }
 ]
