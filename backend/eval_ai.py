@@ -1,35 +1,16 @@
-from openai import AzureOpenAI
 import os
 
 from langchain_openai import AzureChatOpenAI
-from langchain_core.messages import SystemMessage, HumanMessage
 
 from prompts import EVAL_SYSTEM_PROMPT, SUMMARY_SYSTEM_PROMPT
 
 
 class JudgeAI:
-    def __init__(self, api_key: str = None):
+    def __init__(self):
         self.ai = QueryAI()
-        api_key = os.getenv("DIAL_API_KEY")
-        if api_key:
-            self.set_api_key(api_key)
-            self.api_key_is_set = True
-        else:
-            self.api_key_is_set = False
-
-    def set_api_key(self, key: str):
-        if not key or len(key) == 0:
-            self.ai.set_api_key(None)
-            self.api_key_is_set = False
-        else:
-            self.ai.set_api_key(key)
-            self.api_key_is_set = True
 
     def eval(self, question: str, answer: str) -> int:
         """Invoke AI to judge the answer and return integer score from 0 to 4"""
-
-        if not self.api_key_is_set:
-            return 1  # Dummy evaluation
 
         PROMPT = f"""
         Question: {question}
@@ -48,9 +29,6 @@ class JudgeAI:
     def summarize(self, answers: str) -> str:
         """Invoke AI to conduct interview summary"""
 
-        if not self.api_key_is_set:
-            return "API key is not set, can't provide summary"
-
         messages = [
             {"role": "system", "content": SUMMARY_SYSTEM_PROMPT},
             {"role": "user", "content": answers}
@@ -64,9 +42,6 @@ class QueryAI:
     def __init__(self):
         azure_endpoint = os.getenv("AZURE_ENDPOINT", "https://ai-proxy.lab.epam.com")
         api_key = os.getenv("DIAL_API_KEY", "dial-w58u49yhx85pmdawjnmchax51ew")
-
-        if not azure_endpoint:
-            print("Please export AZURE_ENDPOINT environment variable.")
 
         self.client = AzureChatOpenAI(
             api_key=api_key,
