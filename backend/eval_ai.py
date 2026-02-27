@@ -40,8 +40,8 @@ class JudgeAI:
 
 class QueryAI:
     def __init__(self):
-        azure_endpoint = os.getenv("AZURE_ENDPOINT", "https://ai-proxy.lab.epam.com")
-        api_key = os.getenv("DIAL_API_KEY", "dial-w58u49yhx85pmdawjnmchax51ew")
+        azure_endpoint = os.getenv("AZURE_ENDPOINT")
+        api_key = os.getenv("DIAL_API_KEY")
 
         self.client = AzureChatOpenAI(
             api_key=api_key,
@@ -51,9 +51,6 @@ class QueryAI:
             max_tokens=8192,
             temperature=0
         )
-
-    def set_api_key(self, api_key: str):
-        self.client.api_key = api_key
 
     def query_ai(self, messages):
         try:
