@@ -199,5 +199,158 @@
     "level": "A1",
     "parent_nodes": [23],
     "question": "What does Dependency Inversion Principle say about dependencies?"
+  },
+  {
+    "id": 29,
+    "name": "Python",
+    "level": "A1"
+  },
+  {
+    "id": 30,
+    "name": "Variables and Data Types",
+    "level": "A1",
+    "parent_nodes": [29],
+    "question": "What are the main built-in data types in Python?"
+  },
+  {
+    "id": 31,
+    "name": "Mutable vs Immutable",
+    "level": "A1",
+    "parent_nodes": [30],
+    "question": "What is the difference between mutable and immutable objects in Python?",
+    "criteria": "Candidate mentions examples such as list and dict as mutable, and int, str, tuple as immutable."
+  },
+  {
+    "id": 32,
+    "name": "Functions",
+    "level": "A1",
+    "parent_nodes": [29],
+    "question": "What is the difference between positional arguments and keyword arguments in Python?"
+  },
+  {
+    "id": 33,
+    "name": "args and kwargs",
+    "level": "A2",
+    "parent_nodes": [32],
+    "question": "What are *args and **kwargs used for in Python?"
+  },
+  {
+    "id": 34,
+    "name": "OOP in Python",
+    "level": "A1",
+    "parent_nodes": [29],
+    "question": "How does Python support object-oriented programming?"
+  },
+  {
+    "id": 35,
+    "name": "Class vs Instance Attributes",
+    "level": "A1",
+    "parent_nodes": [34],
+    "question": "What is the difference between class attributes and instance attributes in Python?"
+  },
+  {
+    "id": 36,
+    "name": "Inheritance in Python",
+    "level": "A1",
+    "parent_nodes": [34],
+    "question": "How does inheritance work in Python?"
+  },
+  {
+    "id": 37,
+    "name": "Decorators",
+    "level": "A2",
+    "parent_nodes": [29],
+    "question": "What is a decorator in Python and why would you use one?",
+    "criteria": "Candidate explains that decorators wrap or modify function/class behavior without changing the original source directly."
+  },
+  {
+    "id": 38,
+    "name": "List Comprehension",
+    "level": "A1",
+    "parent_nodes": [29],
+    "question": "What is a list comprehension in Python?"
+  },
+  {
+    "id": 39,
+    "name": "Modules and Packages",
+    "level": "A1",
+    "parent_nodes": [29],
+    "question": "What is the difference between a module and a package in Python?"
+  },
+  {
+    "id": 40,
+    "name": "Exception Handling",
+    "level": "A1",
+    "parent_nodes": [29],
+    "question": "How does exception handling work in Python?"
+  },
+  {
+    "id": 41,
+    "name": "Try Except Finally",
+    "level": "A1",
+    "parent_nodes": [40],
+    "question": "What is the purpose of try, except, else, and finally blocks?"
+  },
+  {
+    "id": 42,
+    "name": "Memory Management",
+    "level": "A3",
+    "parent_nodes": [29],
+    "question": "How does memory management work in Python?"
+  },
+  {
+    "id": 43,
+    "name": "Garbage Collection",
+    "level": "A3",
+    "parent_nodes": [42],
+    "question": "What is the role of garbage collection in Python?"
+  },
+  {
+    "id": 44,
+    "name": "Concurrency",
+    "level": "A3",
+    "parent_nodes": [29]
+  },
+  {
+    "id": 45,
+    "name": "Threads vs Processes",
+    "level": "A3",
+    "parent_nodes": [44],
+    "question": "What is the difference between threads and processes in Python?"
+  },
+  {
+    "id": 46,
+    "name": "GIL",
+    "level": "A3",
+    "parent_nodes": [44],
+    "question": "What is the Global Interpreter Lock (GIL) in Python and how does it affect threading?"
+  },
+  {
+    "id": 47,
+    "name": "Asyncio",
+    "level": "A3",
+    "parent_nodes": [44],
+    "question": "What is asyncio in Python and when would you use it?"
+  },
+  {
+    "id": 48,
+    "name": "Iterators and Generators",
+    "level": "A2",
+    "parent_nodes": [29],
+    "question": "What is the difference between an iterator and a generator in Python?"
+  },
+  {
+    "id": 49,
+    "name": "Context Managers",
+    "level": "A2",
+    "parent_nodes": [29],
+    "question": "What is a context manager in Python and how does the with statement work?"
+  },
+  {
+    "id": 50,
+    "name": "Lambda Functions",
+    "level": "A1",
+    "parent_nodes": [29],
+    "question": "What is a lambda function in Python and when is it useful?"
   }
 ]
