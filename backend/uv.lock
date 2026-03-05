@@ -40,7 +40,6 @@ dependencies = [
     { name = "fastapi" },
     { name = "langchain-core" },
     { name = "langchain-openai" },
-    { name = "openai" },
     { name = "ruff" },
     { name = "uvicorn" },
 ]
@@ -50,7 +49,6 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.123.0" },
     { name = "langchain-core", specifier = ">=1.2.15" },
     { name = "langchain-openai", specifier = ">=1.1.10" },
-    { name = "openai", specifier = ">=2.9.0" },
     { name = "ruff", specifier = ">=0.14.7" },
     { name = "uvicorn", specifier = ">=0.38.0" },
 ]

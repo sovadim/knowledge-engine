@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from pydantic import BaseModel
 
@@ -41,3 +41,7 @@ class NodeEditPayload(BaseModel):
 
 class ApiKeyRequest(BaseModel):
     key: str
+
+
+class SkillsResponse(BaseModel):
+    skills: Dict[int, str]

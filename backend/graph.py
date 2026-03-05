@@ -8,6 +8,12 @@ class Graph:
         self._stack: Optional[List[Node]] = []
         self._traversal_level: NodeLevel = None
         self._answers_history: List[str] = []
+        self._skill: int = 1
+
+    SKILLS = {
+        1: "Java",
+        2: "Python"
+    }
 
     def __contains__(self, node_id: int) -> bool:
         return node_id in self._nodes
@@ -114,12 +120,12 @@ class Graph:
     def _fits(self, node: Node) -> bool:
         if node.status == NodeStatus.DISABLED:
             return False
-    
+
         if self._traversal_level is None:
             return True
 
         return node.level.value <= self._traversal_level.value
-    
+
     def _pop(self) -> Node:
         node = self._stack.pop()
         if node.question is None:
@@ -146,9 +152,9 @@ class Graph:
         return "\n".join(self._answers_history)
 
     def _get_root(self) -> Node:
-        return self.get_node(1) # Assuming root node has id 1
+        return self.get_node(self._skill)  # Assuming root node has id 1
 
-    def reset(self, traversal_level: NodeLevel) -> None:
+    def reset(self, traversal_level: NodeLevel, skill: int) -> None:
         """Reset the traverstal state of the graph."""
         # Mark nodes as not reached
         for node in self._nodes.values():
@@ -158,3 +164,4 @@ class Graph:
         self._stack = None
         self._traversal_level = traversal_level
         self._answers_history = []
+        self._skill = skill
