@@ -8,7 +8,7 @@ class Graph:
         self._stack: Optional[List[Node]] = []
         self._traversal_level: NodeLevel = None
         self._answers_history: List[str] = []
-        self._skill: int = 1
+        self._skill_id: int = 1
 
     def __contains__(self, node_id: int) -> bool:
         return node_id in self._nodes
@@ -152,9 +152,9 @@ class Graph:
         return "\n".join(self._answers_history)
 
     def _get_root(self) -> Node:
-        return self.get_node(self._skill)  # Assuming root node has id 1
+        return self.get_node(self._skill_id)
 
-    def reset(self, traversal_level: NodeLevel, skill: int) -> None:
+    def reset(self, traversal_level: NodeLevel, skill_id: int) -> None:
         """Reset the traverstal state of the graph."""
         # Mark nodes as not reached
         for node in self._nodes.values():
@@ -164,4 +164,4 @@ class Graph:
         self._stack = None
         self._traversal_level = traversal_level
         self._answers_history = []
-        self._skill = skill
+        self._skill_id = skill_id

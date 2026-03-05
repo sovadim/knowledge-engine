@@ -160,12 +160,12 @@ def enable_node(node_id: int) -> None:
 
 @app.post("/api/chat/start")
 def chat_start(level: NodeLevel = Query(..., description="Interview level: A1, A2, or A3"),
-               skill: int = Query(..., description="Skill ID, e.g. 1=Java, 2=Python, 8=SQL")):
+               skill_id: int = Query(..., description="Skill ID, e.g. 1=Java, 2=Python, 8=SQL")):
     """
     Start the interview. Returns the first question.
     """
     global last_node
-    graph.reset(level, skill)
+    graph.reset(level, skill_id)
     last_node = graph.next()
 
     if last_node is not None:
