@@ -45,3 +45,6 @@ class ApiKeyRequest(BaseModel):
 
 class SkillsResponse(BaseModel):
     skills: Dict[int, str]
+
+
+

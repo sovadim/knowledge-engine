@@ -12,7 +12,7 @@ class Graph:
 
     SKILLS = {
         1: "Java",
-        2: "Python"
+        29: "Python"
     }
 
     def __contains__(self, node_id: int) -> bool:
