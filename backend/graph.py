@@ -1,4 +1,4 @@
-from dto import Node, NodeStatus, NodeLevel
+from dto import Node, NodeStatus, NodeLevel, NodeType
 from typing import Dict, List, Optional
 
 
@@ -9,11 +9,6 @@ class Graph:
         self._traversal_level: NodeLevel = None
         self._answers_history: List[str] = []
         self._skill: int = 1
-
-    SKILLS = {
-        1: "Java",
-        29: "Python"
-    }
 
     def __contains__(self, node_id: int) -> bool:
         return node_id in self._nodes
@@ -53,6 +48,11 @@ class Graph:
     def get_nodes(self) -> List[Node]:
         """Return all nodes in the graph."""
         return list(self._nodes.values())
+
+    def get_parent_nodes(self):
+        """Return all parent nodes in the graph."""
+
+        return [(node.id, node.name) for node in self._nodes.values() if node.node_type == NodeType.PARENT]
 
     def get_node(self, node_id: int) -> Optional[Node]:
         """Return a single node by id."""

@@ -33,8 +33,9 @@ def list_nodes() -> List[Node]:
 
 @app.get("/api/skills", response_model=SkillsResponse)
 def list_skills() -> SkillsResponse:
+    """Return all skills."""
     return SkillsResponse(
-        skills=graph.SKILLS
+        skills=graph.get_parent_nodes()
     )
 
 

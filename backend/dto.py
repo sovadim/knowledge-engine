@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Optional, Dict
+from typing import List, Optional, Tuple
 
 from pydantic import BaseModel
 
@@ -18,9 +18,16 @@ class NodeLevel(str, Enum):
     A3 = "A3"
 
 
+class NodeType(Enum):
+    PARENT = "parent"
+    Child = "child"
+
+
 class Node(BaseModel):
     id: int
     name: str
+
+    node_type: NodeType
 
     status: Optional[NodeStatus] = NodeStatus.NOT_REACHED
     level: NodeLevel
@@ -44,7 +51,4 @@ class ApiKeyRequest(BaseModel):
 
 
 class SkillsResponse(BaseModel):
-    skills: Dict[int, str]
-
-
-
+    skills: List[Tuple[int, str]]
