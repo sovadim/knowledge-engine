@@ -2,7 +2,8 @@
   {
     "id": 1,
     "name": "Java",
-    "level": "A1"
+    "level": "A1",
+    "node_type": "ROOT"
   },
   {
     "id": 18,
@@ -124,7 +125,8 @@
     "level": "A3",
     "parent_nodes": [10],
     "question": null,
-    "criteria": null
+    "criteria": null,
+    "node_type": "ROOT"
   },
   {
     "id": 13,
@@ -203,7 +205,8 @@
   {
     "id": 29,
     "name": "Python",
-    "level": "A1"
+    "level": "A1",
+    "node_type": "ROOT"
   },
   {
     "id": 30,
@@ -309,7 +312,8 @@
     "id": 44,
     "name": "Concurrency",
     "level": "A3",
-    "parent_nodes": [29]
+    "parent_nodes": [29],
+    "node_type": "ROOT"
   },
   {
     "id": 45,

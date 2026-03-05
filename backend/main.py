@@ -3,7 +3,7 @@ from typing import List
 from fastapi import FastAPI, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from dto import Node, NodeStatus, NodeLevel, NodeEditPayload, ApiKeyRequest
+from dto import Node, NodeStatus, NodeLevel, NodeEditPayload, ApiKeyRequest, SkillsResponse
 from graph import Graph
 from eval_ai import JudgeAI
 
@@ -24,10 +24,19 @@ app.add_middleware(
 graph: Graph = Graph()
 last_node: Node = None
 
+
 @app.get("/api/nodes", response_model=List[Node])
 def list_nodes() -> List[Node]:
     """Return all nodes."""
     return graph.get_nodes()
+
+
+@app.get("/api/skills", response_model=SkillsResponse)
+def list_skills() -> SkillsResponse:
+    """Return all skills."""
+    return SkillsResponse(
+        skills=graph.skills
+    )
 
 
 @app.get("/api/nodes/{node_id}", response_model=Node)
@@ -82,7 +91,7 @@ def edit_node(node_id: int, payload: NodeEditPayload):
 
 
 @app.post("/api/edge", status_code=status.HTTP_201_CREATED)
-def create_edge(from_id: int = Query(..., alias="from"), 
+def create_edge(from_id: int = Query(..., alias="from"),
                 to_id: int = Query(..., alias="to")):
     """Create a directed edge: from_id → to_id"""
     if from_id not in graph:
@@ -103,7 +112,7 @@ def create_edge(from_id: int = Query(..., alias="from"),
 
 
 @app.delete("/api/edge", status_code=status.HTTP_204_NO_CONTENT)
-def delete_edge(from_id: int = Query(..., alias="from"), 
+def delete_edge(from_id: int = Query(..., alias="from"),
                 to_id: int = Query(..., alias="to")):
     """Delete a directed edge: from_id → to_id"""
     if from_id not in graph:
@@ -150,16 +159,18 @@ def enable_node(node_id: int) -> None:
 
 
 @app.post("/api/chat/start")
-def chat_start(level: NodeLevel = Query(..., description="Interview level: A1, A2, or A3")):
+def chat_start(level: NodeLevel = Query(..., description="Interview level: A1, A2, or A3"),
+               skill_id: int = Query(..., description="Skill ID, e.g. 1=Java, 2=Python, 8=SQL")):
     """
     Start the interview. Returns the first question.
     """
     global last_node
-    graph.reset(level)
+    graph.reset(level, skill_id)
     last_node = graph.next()
+
     if last_node is not None:
         return {
-            "question": last_node.question, # Graph returns nodes with non-None questions only
+            "question": last_node.question,  # Graph returns nodes with non-None questions only
             "completed": False
         }
     else:
