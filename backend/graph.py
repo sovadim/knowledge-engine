@@ -27,7 +27,7 @@ class Graph:
         """Add a node to the graph."""
         self._nodes[node.id] = node
         # Add node as child to its parents
-        if node.node_type == NodeType.PARENT and not self._skills.get(node.name, False):
+        if node.node_type == NodeType.ROOT and not self._skills.get(node.name, False):
             self._skills[node.name] = node.id
 
         for parent_node_id in node.parent_nodes:

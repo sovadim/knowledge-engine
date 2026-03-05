@@ -19,7 +19,7 @@ class NodeLevel(str, Enum):
 
 
 class NodeType(Enum):
-    PARENT = "PARENT"
+    ROOT = "ROOT"
     Child = "CHILD"
 
 
