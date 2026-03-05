@@ -9,6 +9,7 @@ class Graph:
         self._traversal_level: NodeLevel = None
         self._answers_history: List[str] = []
         self._skill_id: int = 1
+        self._skills: Dict[str, int] = {}
 
     def __contains__(self, node_id: int) -> bool:
         return node_id in self._nodes
@@ -16,10 +17,19 @@ class Graph:
     def __getitem__(self, key) -> Optional[Node]:
         return self._nodes.get(key)
 
+    @property
+    def skills(self):
+        """Return all parent nodes in the graph."""
+
+        return self._skills
+
     def add_node(self, node: Node) -> None:
         """Add a node to the graph."""
         self._nodes[node.id] = node
         # Add node as child to its parents
+        if node.node_type == NodeType.PARENT and not self._skills.get(node.name, False):
+            self._skills[node.name] = node.id
+
         for parent_node_id in node.parent_nodes:
             parent_node: Node = self[parent_node_id]
             if parent_node is not None and node.id not in parent_node.child_nodes:
@@ -48,11 +58,6 @@ class Graph:
     def get_nodes(self) -> List[Node]:
         """Return all nodes in the graph."""
         return list(self._nodes.values())
-
-    def get_parent_nodes(self):
-        """Return all parent nodes in the graph."""
-
-        return [(node.id, node.name) for node in self._nodes.values() if node.node_type == NodeType.PARENT]
 
     def get_node(self, node_id: int) -> Optional[Node]:
         """Return a single node by id."""

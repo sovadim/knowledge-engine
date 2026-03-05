@@ -35,7 +35,7 @@ def list_nodes() -> List[Node]:
 def list_skills() -> SkillsResponse:
     """Return all skills."""
     return SkillsResponse(
-        skills=graph.get_parent_nodes()
+        skills=graph.skills
     )
 
 

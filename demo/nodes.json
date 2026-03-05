@@ -3,38 +3,34 @@
     "id": 1,
     "name": "Java",
     "level": "A1",
-    "node_type": "parent"
+    "node_type": "PARENT"
   },
   {
     "id": 18,
     "name": "Classes",
     "level": "A1",
-    "parent_nodes": [1],
-    "node_type": "parent"
+    "parent_nodes": [1]
   },
   {
     "id": 19,
     "name": "Class and object",
     "level": "A1",
     "parent_nodes": [18],
-    "question": "What is the difference between a class and an object?",
-    "node_type": "parent"
+    "question": "What is the difference between a class and an object?"
   },
   {
     "id": 20,
     "name": "Access modifiers",
     "level": "A1",
     "parent_nodes": [18],
-    "question": "What are public, private, and protected used for?",
-    "node_type": "child"
+    "question": "What are public, private, and protected used for?"
   },
   {
     "id": 21,
     "name": "Constructor",
     "level": "A1",
     "parent_nodes": [18],
-    "question": "What is a constructor and when is it called?",
-    "node_type": "child"
+    "question": "What is a constructor and when is it called?"
   },
   {
     "id": 2,
@@ -42,16 +38,14 @@
     "level": "A1",
     "parent_nodes": [18],
     "question": "What is the difference between a static nested class and a non-static inner class?",
-    "criteria": "User mentioned: Static nested classes behave like regular static members and reduce memory footprint. Inner classes hold an implicit reference to the outer instance, which impacts design and potential memory leaks.",
-    "node_type": "child"
+    "criteria": "User mentioned: Static nested classes behave like regular static members and reduce memory footprint. Inner classes hold an implicit reference to the outer instance, which impacts design and potential memory leaks."
   },
   {
     "id": 22,
     "name": "Composition vs Inheritance",
     "level": "A2",
     "parent_nodes": [19, 8],
-    "question": "What is the difference between composition and inheritance?",
-    "node_type": "child"
+    "question": "What is the difference between composition and inheritance?"
   },
   {
     "id": 3,
@@ -60,8 +54,7 @@
     "level": "A1",
     "parent_nodes": [1],
     "question": "What is the purpose of a Java package?",
-    "criteria": "User mentions: Packages group classes and avoid name conflicts. Packaging organizes code logically and controls access (default access). Explains how packaging supports maintainability, modularization, and clear layering in larger codebases.",
-    "node_type": "child"
+    "criteria": "User mentions: Packages group classes and avoid name conflicts. Packaging organizes code logically and controls access (default access). Explains how packaging supports maintainability, modularization, and clear layering in larger codebases."
   },
   {
     "id": 4,
@@ -70,8 +63,7 @@
     "level": "A1",
     "parent_nodes": [1],
     "question": "What is Java Serialization and why do we use it?",
-    "criteria": "User mentions: Serialization is the conversion of object graphs to bytes. Used in distributed systems, persistence, and messaging. Understands limitations and alternatives (JSON).",
-    "node_type": "child"
+    "criteria": "User mentions: Serialization is the conversion of object graphs to bytes. Used in distributed systems, persistence, and messaging. Understands limitations and alternatives (JSON)."
   },
   {
     "id": 5,
@@ -79,8 +71,7 @@
     "level": "A1",
     "parent_nodes": [1],
     "question": "What are the four main principles of Object-Oriented Programming?",
-    "criteria": "Candidate mentions: abstraction, encapsulation, inheritance, polymorphism",
-    "node_type": "parent"
+    "criteria": "Candidate mentions: abstraction, encapsulation, inheritance, polymorphism"
   },
   {
     "id": 6,
@@ -88,8 +79,7 @@
     "level": "A1",
     "parent_nodes": [5],
     "question": "How does Java implement the concept of abstraction?",
-    "criteria": "",
-    "node_type": "child"
+    "criteria": ""
   },
   {
     "id": 7,
@@ -97,8 +87,7 @@
     "level": "A1",
     "parent_nodes": [5],
     "question": "Can you explain the concept of polymorphism in Java?",
-    "criteria": "",
-    "node_type": "child"
+    "criteria": ""
   },
   {
     "id": 8,
@@ -106,8 +95,7 @@
     "level": "A1",
     "parent_nodes": [5],
     "question": "How does Java implement the concept of inheritance?",
-    "criteria": "",
-    "node_type": "parent"
+    "criteria": ""
   },
   {
     "id": 9,
@@ -115,15 +103,13 @@
     "level": "A1",
     "parent_nodes": [5],
     "question": "What is encapsulation in Java and how is it achieved?",
-    "criteria": "",
-    "node_type": "child"
+    "criteria": ""
   },
   {
     "id": 10,
     "name": "JVM",
     "level": "A3",
-    "parent_nodes": [1],
-    "node_type": "parent"
+    "parent_nodes": [1]
   },
   {
     "id": 11,
@@ -131,8 +117,7 @@
     "level": "A3",
     "parent_nodes": [10],
     "question": "When implementing a custom class loader in Java is justified?",
-    "criteria": "",
-    "node_type": "child"
+    "criteria": ""
   },
   {
     "id": 12,
@@ -141,7 +126,7 @@
     "parent_nodes": [10],
     "question": null,
     "criteria": null,
-    "node_type": "parent"
+    "node_type": "PARENT"
   },
   {
     "id": 13,
@@ -149,98 +134,86 @@
     "level": "A3",
     "parent_nodes": [12],
     "question": "What is the role of garbage collection in Java?",
-    "criteria": "",
-    "node_type": "child"
+    "criteria": ""
   },
   {
     "id": 14,
     "name": "Concurrency",
     "level": "A3",
-    "parent_nodes": [1],
-    "node_type": "parent"
+    "parent_nodes": [1]
   },
   {
     "id": 15,
     "name": "Threads",
     "level": "A3",
-    "parent_nodes": [14],
-    "node_type": "child"
+    "parent_nodes": [14]
   },
   {
     "id": 16,
     "name": "Synchronization",
     "level": "A3",
-    "parent_nodes": [14],
-    "node_type": "child"
+    "parent_nodes": [14]
   },
   {
     "id": 17,
     "name": "Concurrent Collections",
     "level": "A3",
-    "parent_nodes": [14],
-    "node_type": "child"
+    "parent_nodes": [14]
   },
   {
     "id": 23,
     "name": "SOLID Principles",
     "level": "A1",
     "parent_nodes": [1],
-    "question": "What SOLID principles do you know?",
-    "node_type": "parent"
+    "question": "What SOLID principles do you know?"
   },
   {
     "id": 24,
     "name": "Single Responsibility Principle",
     "level": "A1",
     "parent_nodes": [23],
-    "question": "What does the Single Responsibility Principle mean?",
-    "node_type": "child"
+    "question": "What does the Single Responsibility Principle mean?"
   },
   {
     "id": 25,
     "name": "Open/Closed Principle",
     "level": "A1",
     "parent_nodes": [23],
-    "question": "What does the Open/Closed Principle mean?",
-    "node_type": "child"
+    "question": "What does the Open/Closed Principle mean?"
   },
   {
     "id": 26,
     "name": "Liskov Substitution Principle",
     "level": "A1",
     "parent_nodes": [23],
-    "question": "What does Liskov Substitution Principle say about subclasses?",
-    "node_type": "child"
+    "question": "What does Liskov Substitution Principle say about subclasses?"
   },
   {
     "id": 27,
     "name": "Interface Segregation Principle",
     "level": "A1",
     "parent_nodes": [23],
-    "question": "What problem does the Interface Segregation Principle try to solve?",
-    "node_type": "child"
+    "question": "What problem does the Interface Segregation Principle try to solve?"
   },
   {
     "id": 28,
     "name": "Dependency Inversion Principle",
     "level": "A1",
     "parent_nodes": [23],
-    "question": "What does Dependency Inversion Principle say about dependencies?",
-    "node_type": "child"
+    "question": "What does Dependency Inversion Principle say about dependencies?"
   },
   {
     "id": 29,
     "name": "Python",
     "level": "A1",
-    "node_type": "parent"
+    "node_type": "PARENT"
   },
   {
     "id": 30,
     "name": "Variables and Data Types",
     "level": "A1",
     "parent_nodes": [29],
-    "question": "What are the main built-in data types in Python?",
-    "node_type": "parent"
+    "question": "What are the main built-in data types in Python?"
   },
   {
     "id": 31,
@@ -248,48 +221,42 @@
     "level": "A1",
     "parent_nodes": [30],
     "question": "What is the difference between mutable and immutable objects in Python?",
-    "criteria": "Candidate mentions examples such as list and dict as mutable, and int, str, tuple as immutable.",
-    "node_type": "child"
+    "criteria": "Candidate mentions examples such as list and dict as mutable, and int, str, tuple as immutable."
   },
   {
     "id": 32,
     "name": "Functions",
     "level": "A1",
     "parent_nodes": [29],
-    "question": "What is the difference between positional arguments and keyword arguments in Python?",
-    "node_type": "parent"
+    "question": "What is the difference between positional arguments and keyword arguments in Python?"
   },
   {
     "id": 33,
     "name": "args and kwargs",
     "level": "A2",
     "parent_nodes": [32],
-    "question": "What are *args and **kwargs used for in Python?",
-    "node_type": "child"
+    "question": "What are *args and **kwargs used for in Python?"
   },
   {
     "id": 34,
     "name": "OOP in Python",
     "level": "A1",
     "parent_nodes": [29],
-    "question": "How does Python support object-oriented programming?",
-    "node_type": "parent"
+    "question": "How does Python support object-oriented programming?"
   },
   {
     "id": 35,
     "name": "Class vs Instance Attributes",
     "level": "A1",
     "parent_nodes": [34],
-    "question": "What is the difference between class attributes and instance attributes in Python?",
-    "node_type": "child"
+    "question": "What is the difference between class attributes and instance attributes in Python?"
   },
   {
     "id": 36,
     "name": "Inheritance in Python",
     "level": "A1",
     "parent_nodes": [34],
-    "question": "How does inheritance work in Python?",
-    "node_type": "child"
+    "question": "How does inheritance work in Python?"
   },
   {
     "id": 37,
@@ -297,110 +264,97 @@
     "level": "A2",
     "parent_nodes": [29],
     "question": "What is a decorator in Python and why would you use one?",
-    "criteria": "Candidate explains that decorators wrap or modify function/class behavior without changing the original source directly.",
-    "node_type": "child"
+    "criteria": "Candidate explains that decorators wrap or modify function/class behavior without changing the original source directly."
   },
   {
     "id": 38,
     "name": "List Comprehension",
     "level": "A1",
     "parent_nodes": [29],
-    "question": "What is a list comprehension in Python?",
-    "node_type": "child"
+    "question": "What is a list comprehension in Python?"
   },
   {
     "id": 39,
     "name": "Modules and Packages",
     "level": "A1",
     "parent_nodes": [29],
-    "question": "What is the difference between a module and a package in Python?",
-    "node_type": "child"
+    "question": "What is the difference between a module and a package in Python?"
   },
   {
     "id": 40,
     "name": "Exception Handling",
     "level": "A1",
     "parent_nodes": [29],
-    "question": "How does exception handling work in Python?",
-    "node_type": "parent"
+    "question": "How does exception handling work in Python?"
   },
   {
     "id": 41,
     "name": "Try Except Finally",
     "level": "A1",
     "parent_nodes": [40],
-    "question": "What is the purpose of try, except, else, and finally blocks?",
-    "node_type": "child"
+    "question": "What is the purpose of try, except, else, and finally blocks?"
   },
   {
     "id": 42,
     "name": "Memory Management",
     "level": "A3",
     "parent_nodes": [29],
-    "question": "How does memory management work in Python?",
-    "node_type": "parent"
+    "question": "How does memory management work in Python?"
   },
   {
     "id": 43,
     "name": "Garbage Collection",
     "level": "A3",
     "parent_nodes": [42],
-    "question": "What is the role of garbage collection in Python?",
-    "node_type": "child"
+    "question": "What is the role of garbage collection in Python?"
   },
   {
     "id": 44,
     "name": "Concurrency",
     "level": "A3",
     "parent_nodes": [29],
-    "node_type": "parent"
+    "node_type": "PARENT"
   },
   {
     "id": 45,
     "name": "Threads vs Processes",
     "level": "A3",
     "parent_nodes": [44],
-    "question": "What is the difference between threads and processes in Python?",
-    "node_type": "child"
+    "question": "What is the difference between threads and processes in Python?"
   },
   {
     "id": 46,
     "name": "GIL",
     "level": "A3",
     "parent_nodes": [44],
-    "question": "What is the Global Interpreter Lock (GIL) in Python and how does it affect threading?",
-    "node_type": "child"
+    "question": "What is the Global Interpreter Lock (GIL) in Python and how does it affect threading?"
   },
   {
     "id": 47,
     "name": "Asyncio",
     "level": "A3",
     "parent_nodes": [44],
-    "question": "What is asyncio in Python and when would you use it?",
-    "node_type": "child"
+    "question": "What is asyncio in Python and when would you use it?"
   },
   {
     "id": 48,
     "name": "Iterators and Generators",
     "level": "A2",
     "parent_nodes": [29],
-    "question": "What is the difference between an iterator and a generator in Python?",
-    "node_type": "child"
+    "question": "What is the difference between an iterator and a generator in Python?"
   },
   {
     "id": 49,
     "name": "Context Managers",
     "level": "A2",
     "parent_nodes": [29],
-    "question": "What is a context manager in Python and how does the with statement work?",
-    "node_type": "child"
+    "question": "What is a context manager in Python and how does the with statement work?"
   },
   {
     "id": 50,
     "name": "Lambda Functions",
     "level": "A1",
     "parent_nodes": [29],
-    "question": "What is a lambda function in Python and when is it useful?",
-    "node_type": "child"
+    "question": "What is a lambda function in Python and when is it useful?"
   }
 ]
