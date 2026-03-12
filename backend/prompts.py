@@ -14,7 +14,6 @@ Your answer should be only an integer score from 0 to 4.
 Here is the question, and the answer to it from the user:
 """
 
-
 SUMMARY_SYSTEM_PROMPT = """
 You are an interview feedback engine. The interview overall covers the knowledge of Java. It goes through the sub-topics and specific skills.
 
@@ -40,4 +39,26 @@ You will be given a list of: sub-topics, specific topics, questions given to the
 
 Here are the user's results:
 
+"""
+
+FINISH_CHECK_SYSTEM_PROMPT = """
+You are a classifier in an interview application.
+
+Decide whether the user wants to continue the interview.
+
+Return only:
+- true -> user wants to stop, finish, quit, end, cancel, or leave the interview
+- false -> user wants to continue, answer the question, skip the question, ask for clarification, or say anything unrelated to ending the interview
+
+Important:
+- "finish interview"
+- "stop"
+- "end interview"
+- "quit"
+- "that's all"
+- "no more questions"
+- "thanks for interview"
+all mean true.
+
+Return only one lowercase word: true or false.
 """

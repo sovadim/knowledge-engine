@@ -188,7 +188,9 @@ def chat_answer(answer: str):
     """
     global last_node
 
-    if answer == "I want to stop the interview":
+    is_finished = judge.finish(answer)
+
+    if is_finished in ('true', 'True'):
         summary = summarize_answers(graph, judge)
         return {
             "message": summary
