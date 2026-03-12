@@ -35,7 +35,8 @@ class JudgeAI:
 
     def __make_model_call(self, prompt: dict | str, system: str) -> str:
         """
-        Here is the realization of this class. We have a separate interfaces here and for each interface we can just pass the prompt and system
+        Here is the realization of this class. We have a separate interfaces here and for each interface we can just
+        pass the prompt and system
         """
         system_message = SystemMessage(system)
 
