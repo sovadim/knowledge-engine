@@ -3,6 +3,7 @@ from typing import List
 from fastapi import FastAPI, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 
+from helper import summarize_answers
 from dto import Node, NodeStatus, NodeLevel, NodeEditPayload, ApiKeyRequest, SkillsResponse
 from graph import Graph
 from eval_ai import JudgeAI
@@ -186,10 +187,20 @@ def chat_answer(answer: str):
     Receive user's answer and return next question.
     """
     global last_node
+
+    is_finished = judge.finish(answer)
+
+    if is_finished in ('true', 'True'):
+        summary = summarize_answers(graph, judge)
+        return {
+            "message": summary
+        }
+
     score: int = judge.eval(question=last_node.question, answer=answer)
+
     graph.eval(last_node, score)
-    last_node = graph.next()
-    if last_node is not None:
+
+    if last_node := graph.next():
         return {
             "question": last_node.question,
             "completed": False,
@@ -206,9 +217,9 @@ def chat_stop():
     """
     Stop the interview.
     """
-    answers: str = graph.get_answers()
-    print("ANSWERS: ", answers)
-    summary: str = judge.summarize(answers)
+
+    summary = summarize_answers(graph, judge)
+
     return {
         "message": summary
     }

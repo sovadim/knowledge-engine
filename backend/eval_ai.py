@@ -2,7 +2,9 @@ import os
 
 from langchain_openai import AzureChatOpenAI
 
-from prompts import EVAL_SYSTEM_PROMPT, SUMMARY_SYSTEM_PROMPT
+from langchain_core.messages import SystemMessage, HumanMessage
+
+from prompts import EVAL_SYSTEM_PROMPT, SUMMARY_SYSTEM_PROMPT, FINISH_CHECK_SYSTEM_PROMPT
 
 
 class JudgeAI:
@@ -17,24 +19,33 @@ class JudgeAI:
         Answer: {answer}
         """
 
-        messages = [
-            {"role": "system", "content": EVAL_SYSTEM_PROMPT},
-            {"role": "user", "content": PROMPT}
-        ]
+        score = int(self.__make_model_call(PROMPT, EVAL_SYSTEM_PROMPT))
 
-        response = self.ai.query_ai(messages)
-        score = int(response[0])
         return score
 
     def summarize(self, answers: str) -> str:
         """Invoke AI to conduct interview summary"""
 
-        messages = [
-            {"role": "system", "content": SUMMARY_SYSTEM_PROMPT},
-            {"role": "user", "content": answers}
-        ]
+        return self.__make_model_call(answers, SUMMARY_SYSTEM_PROMPT)
+
+    def finish(self, answer: str) -> str:
+        """Invoke AI to understand user want to finish interview"""
+
+        return self.__make_model_call(answer, FINISH_CHECK_SYSTEM_PROMPT)
+
+    def __make_model_call(self, prompt: dict | str, system: str) -> str:
+        """
+        Here is the realization of this class. We have a separate interfaces here and for each interface we can just
+        pass the prompt and system
+        """
+        system_message = SystemMessage(system)
+
+        human_message = HumanMessage(prompt)
+
+        messages = [system_message, human_message]
 
         response = self.ai.query_ai(messages)
+
         return response[0]
 
 
