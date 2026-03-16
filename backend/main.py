@@ -225,6 +225,13 @@ def chat_stop():
     }
 
 
+@app.post("/api/chat/messages")
+def chat_messages(text: str):
+    return {
+        "message": "Stub answer"
+    }
+
+
 @app.post("/api/config/api-key", status_code=status.HTTP_204_NO_CONTENT)
 def set_api_key(request: ApiKeyRequest):
     """

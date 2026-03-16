@@ -19,7 +19,7 @@ frontend: frontend-init
 backend-init:
 	@cd backend && uv sync
 
-backend:
+backend: backend-init
 	@echo "Starting backend..."
 	@cd backend && uv run uvicorn main:app --reload > backend.log 2>&1 &
 	@echo "Backend started on http://localhost:8000"
